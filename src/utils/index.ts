@@ -44,5 +44,8 @@ export * from "./forms/actions";
 // Formatting utilities
 export * from "./formatting/dates";
 
+// Localization utilities
+export * from "./localization";
+
 // Testing utilities
 export * from "./testing/amadeus-api-test";

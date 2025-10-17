@@ -5,7 +5,8 @@
  */
 
 import { FormFieldConfig } from "../../../../hooks";
-import { COUNTRIES, LANGUAGES } from "../../../../utils";
+import { COUNTRIES } from "../../../../utils";
+import { getLanguageOptions } from "../../../../utils/localization";
 
 export const GUEST_FORM_FIELDS: FormFieldConfig[] = [
   // Guest Basic Information (side by side)
@@ -94,9 +95,9 @@ export const GUEST_FORM_FIELDS: FormFieldConfig[] = [
     required: false,
     placeholder: "Select preferred language",
     gridColumn: "half" as const,
-    options: LANGUAGES.map((language) => ({
-      value: language,
-      label: language,
+    options: getLanguageOptions().map((lang) => ({
+      value: lang.value,
+      label: lang.label,
     })),
   },
 
