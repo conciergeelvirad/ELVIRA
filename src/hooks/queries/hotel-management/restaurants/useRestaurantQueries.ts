@@ -15,6 +15,9 @@ import {
   RestaurantCreateData,
   RestaurantUpdateData,
   RestaurantDeletionData,
+  MenuItemInsert,
+  MenuItemUpdateData,
+  MenuItemDeletionData,
 } from "./restaurant.types";
 import {
   restaurantKeys,
@@ -226,6 +229,122 @@ export const useRestaurantDineInOrders = (hotelId: string) => {
 
       if (error) throw error;
       return (orders as DineInOrderWithDetails[]) || [];
+    },
+  });
+};
+
+// ============================================================================
+// Menu Item Mutation Hooks
+// ============================================================================
+
+/**
+ * Creates a new menu item
+ *
+ * @returns Mutation result for creating menu item
+ */
+export const useCreateMenuItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: MenuItemInsert): Promise<MenuItem> => {
+      console.log("🔄 CREATE MENU ITEM MUTATION:", data);
+      const { data: menuItem, error } = await supabase
+        .from("menu_items")
+        .insert(data)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("❌ CREATE MENU ITEM ERROR:", error);
+        throw error;
+      }
+      console.log("✅ CREATE MENU ITEM SUCCESS:", menuItem);
+      return menuItem as MenuItem;
+    },
+    onSuccess: (data) => {
+      console.log("🔄 INVALIDATING QUERIES after menu item creation");
+      queryClient.invalidateQueries({
+        queryKey: ["menu-items", data.hotel_id],
+      });
+      data.restaurant_ids.forEach((restaurantId) => {
+        queryClient.invalidateQueries({
+          queryKey: restaurantKeys.menuItemsList(restaurantId),
+        });
+      });
+    },
+  });
+};
+
+/**
+ * Updates an existing menu item
+ *
+ * @returns Mutation result for updating menu item
+ */
+export const useUpdateMenuItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: MenuItemUpdateData): Promise<MenuItem> => {
+      console.log("🔄 UPDATE MENU ITEM MUTATION:", { id, updates });
+      const { data, error } = await supabase
+        .from("menu_items")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("❌ UPDATE MENU ITEM ERROR:", error);
+        throw error;
+      }
+      console.log("✅ UPDATE MENU ITEM SUCCESS:", data);
+      return data as MenuItem;
+    },
+    onSuccess: (data) => {
+      console.log("🔄 INVALIDATING QUERIES after menu item update");
+      queryClient.invalidateQueries({
+        queryKey: ["menu-items", data.hotel_id],
+      });
+      data.restaurant_ids.forEach((restaurantId) => {
+        queryClient.invalidateQueries({
+          queryKey: restaurantKeys.menuItemsList(restaurantId),
+        });
+      });
+    },
+  });
+};
+
+/**
+ * Deletes a menu item (soft delete by setting is_active to false)
+ *
+ * @returns Mutation result for deleting menu item
+ */
+export const useDeleteMenuItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id }: MenuItemDeletionData): Promise<string> => {
+      console.log("🔄 DELETE MENU ITEM MUTATION:", id);
+      // Soft delete by setting is_active to false
+      const { error } = await supabase
+        .from("menu_items")
+        .update({ is_active: false })
+        .eq("id", id);
+
+      if (error) {
+        console.error("❌ DELETE MENU ITEM ERROR:", error);
+        throw error;
+      }
+      console.log("✅ DELETE MENU ITEM SUCCESS:", id);
+      return id;
+    },
+    onSuccess: () => {
+      console.log("🔄 INVALIDATING QUERIES after menu item deletion");
+      queryClient.invalidateQueries({ queryKey: ["menu-items"] });
+      queryClient.invalidateQueries({ queryKey: restaurantKeys.lists() });
     },
   });
 };

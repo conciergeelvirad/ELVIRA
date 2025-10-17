@@ -10,6 +10,7 @@ import {
 } from "../../components";
 import type { useProductCRUD } from "./useProductCRUD";
 import type { useShopOrderCRUD } from "./useShopOrderCRUD";
+import { useHotelStaff } from "../../../../components/common";
 
 interface UseShopPageContentProps {
   productsLoading: boolean;
@@ -37,6 +38,9 @@ export const useShopPageContent = ({
   shopOrderCRUD,
   safeHotelId,
 }: UseShopPageContentProps): TabConfig[] => {
+  // Get hotel currency from context
+  const { currency } = useHotelStaff();
+
   // Extract CRUD actions for products
   const { handleStatusToggle: productStatusToggle } = productCRUD;
 
@@ -45,16 +49,18 @@ export const useShopPageContent = ({
     () =>
       getProductTableColumns({
         handleStatusToggle: productStatusToggle,
+        currency,
       }),
-    [productStatusToggle]
+    [productStatusToggle, currency]
   );
 
   const productGridColumns = React.useMemo(
     () =>
       getProductGridColumns({
         handleStatusToggle: productStatusToggle,
+        currency,
       }),
-    [productStatusToggle]
+    [productStatusToggle, currency]
   );
 
   // Get columns based on current state for orders
@@ -70,9 +76,16 @@ export const useShopPageContent = ({
         crud={productCRUD}
         tableColumns={productTableColumns}
         gridColumns={productGridColumns}
+        currency={currency}
       />
     ),
-    [productsLoading, productCRUD, productTableColumns, productGridColumns]
+    [
+      productsLoading,
+      productCRUD,
+      productTableColumns,
+      productGridColumns,
+      currency,
+    ]
   );
 
   const ordersContent = React.useMemo(

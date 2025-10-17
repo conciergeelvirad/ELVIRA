@@ -68,6 +68,9 @@ export const useAmenityCRUD = ({
         ...(data.is_active !== undefined && {
           is_active: data.is_active as boolean,
         }),
+        ...(data.recommended !== undefined && {
+          recommended: data.recommended as boolean,
+        }),
         ...(data.hotel_recommended !== undefined && {
           hotel_recommended: data.hotel_recommended as boolean,
         }),
@@ -96,6 +99,7 @@ export const useAmenityCRUD = ({
     formState: crud.formState,
     formActions: crud.formActions,
     handleStatusToggle: crud.handleStatusToggle,
+    handleRecommendedToggle: crud.handleRecommendedToggle,
     handleCreateSubmit: crud.handleCreateSubmit,
     handleEditSubmit: crud.handleEditSubmit,
     handleDeleteConfirm: crud.handleDeleteConfirm,

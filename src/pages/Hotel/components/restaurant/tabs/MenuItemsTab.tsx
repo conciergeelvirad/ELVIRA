@@ -9,6 +9,7 @@ import {
   Button,
   SearchAndFilterBar,
   CRUDModalContainer,
+  useHotelStaff,
 } from "../../../../../components/common";
 import {
   MenuItemsDataView,
@@ -24,6 +25,9 @@ interface MenuItemsTabProps {
 }
 
 export const MenuItemsTab = ({ hotelId, menuItemCRUD }: MenuItemsTabProps) => {
+  // Get hotel currency from context
+  const { currency } = useHotelStaff();
+
   // Fetch restaurants for displaying restaurant names in the menu items table
   const { data: restaurants = [] } = useRestaurants(hotelId);
 
@@ -68,6 +72,14 @@ export const MenuItemsTab = ({ hotelId, menuItemCRUD }: MenuItemsTabProps) => {
         }}
         handleStatusToggle={menuItemCRUD.handleStatusToggle}
         restaurants={restaurants}
+        currency={currency}
+        handleRecommendedToggle={(id, newValue) =>
+          menuItemCRUD.handleRecommendedToggle(
+            id,
+            newValue,
+            "hotel_recommended"
+          )
+        }
       />
       <CRUDModalContainer
         modalState={menuItemCRUD.modalState}

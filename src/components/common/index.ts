@@ -11,3 +11,5 @@ export * from "./detail-view";
 
 // Standalone components
 export { NotificationBadge } from "./NotificationBadge";
+export { HotelStaffProvider, useHotelStaff } from "./HotelStaffProvider";
+export type { HotelStaff, HotelStaffContextType } from "./HotelStaffProvider";

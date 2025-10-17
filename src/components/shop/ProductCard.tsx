@@ -8,6 +8,7 @@ interface ProductCardProps {
   onEdit?: (product: Product) => void;
   onDelete?: (id: string) => void;
   onRecommendedToggle?: (id: string, newValue: boolean) => Promise<void>;
+  currency?: string;
 }
 
 export const ProductCard = ({
@@ -16,6 +17,7 @@ export const ProductCard = ({
   onEdit,
   onDelete,
   onRecommendedToggle,
+  currency = "$",
 }: ProductCardProps) => {
   // Build sections
   const sections: Array<{
@@ -84,7 +86,11 @@ export const ProductCard = ({
                 }
               }}
               className="hover:scale-110 transition-transform"
-              title={product.recommended ? "Remove from recommended" : "Mark as recommended"}
+              title={
+                product.recommended
+                  ? "Remove from recommended"
+                  : "Mark as recommended"
+              }
             >
               <Star
                 className={`w-4 h-4 flex-shrink-0 ${
@@ -104,7 +110,7 @@ export const ProductCard = ({
       badge={statusBadge}
       price={{
         value: product.price,
-        currency: "€",
+        currency: currency,
         className: "text-xl font-bold text-blue-600",
       }}
       sections={sections}

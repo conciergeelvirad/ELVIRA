@@ -19,6 +19,7 @@ interface ProductsTabProps {
   crud: ReturnType<typeof useProductCRUD>;
   tableColumns: any[];
   gridColumns: any[];
+  currency?: string;
 }
 
 /**
@@ -35,6 +36,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
   crud,
   tableColumns,
   gridColumns,
+  currency,
 }) => {
   const {
     searchAndFilter,
@@ -92,6 +94,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
         tableColumns={tableColumns}
         gridColumns={gridColumns}
         handleStatusToggle={handleStatusToggle}
+        currency={currency}
         handleRecommendedToggle={(id, newValue) =>
           crud.handleRecommendedToggle(id, newValue, "recommended")
         }

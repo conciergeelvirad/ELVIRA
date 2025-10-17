@@ -65,3 +65,40 @@ export interface RestaurantDeletionData {
   id: string;
   hotelId: string;
 }
+
+// Menu Item operation payloads
+export interface MenuItemInsert {
+  hotel_id: string;
+  name: string;
+  description?: string | null;
+  category: string;
+  price: number;
+  service_type?: string[] | null;
+  special_type?: string[] | null;
+  restaurant_ids: string[];
+  is_active?: boolean;
+  image_url?: string | null;
+  hotel_recommended?: boolean | null;
+}
+
+export interface MenuItemUpdate {
+  name?: string;
+  description?: string | null;
+  category?: string;
+  price?: number;
+  service_type?: string[] | null;
+  special_type?: string[] | null;
+  restaurant_ids?: string[];
+  is_active?: boolean;
+  image_url?: string | null;
+  hotel_recommended?: boolean | null;
+}
+
+export interface MenuItemUpdateData {
+  id: string;
+  updates: MenuItemUpdate;
+}
+
+export interface MenuItemDeletionData {
+  id: string;
+}

@@ -12,10 +12,12 @@ export const enhanceProduct = (product: Product): EnhancedProduct => {
 
 interface GetColumnsOptions {
   handleStatusToggle: (id: string, newStatus: boolean) => void;
+  currency?: string;
 }
 
 export const getTableColumns = ({
   handleStatusToggle,
+  currency = "$",
 }: GetColumnsOptions): Column<Product>[] => {
   return [
     {
@@ -49,7 +51,8 @@ export const getTableColumns = ({
       sortable: true,
       render: (value) => (
         <span className="font-semibold text-green-600">
-          ${typeof value === "number" ? value.toFixed(2) : "0.00"}
+          {currency}
+          {typeof value === "number" ? value.toFixed(2) : "0.00"}
         </span>
       ),
     },
@@ -98,6 +101,7 @@ export const getTableColumns = ({
 
 export const getGridColumns = ({
   handleStatusToggle,
+  currency = "$",
 }: GetColumnsOptions): GridColumn[] => {
   return [
     {
@@ -114,7 +118,7 @@ export const getGridColumns = ({
       key: "price",
       label: "Price",
       accessor: "price",
-      render: (value: number) => `$${value.toFixed(2)}`,
+      render: (value: number) => `${currency}${value.toFixed(2)}`,
     },
     {
       key: "stock_quantity",

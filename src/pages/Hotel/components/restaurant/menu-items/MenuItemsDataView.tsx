@@ -25,6 +25,12 @@ interface MenuItemsDataViewProps {
   onDelete: (item: MenuItem) => void;
   handleStatusToggle: (id: string, newStatus: boolean) => void;
   restaurants: Restaurant[];
+  currency?: string;
+  handleRecommendedToggle?: (
+    id: string | number,
+    newValue: boolean,
+    fieldName?: "recommended" | "hotel_recommended"
+  ) => Promise<void>;
 }
 
 export const MenuItemsDataView: React.FC<MenuItemsDataViewProps> = ({
@@ -35,10 +41,13 @@ export const MenuItemsDataView: React.FC<MenuItemsDataViewProps> = ({
   onDelete,
   handleStatusToggle,
   restaurants,
+  currency,
+  handleRecommendedToggle,
 }) => {
   const tableColumns = useMemo(
-    () => getMenuItemTableColumns({ handleStatusToggle, restaurants }),
-    [handleStatusToggle, restaurants]
+    () =>
+      getMenuItemTableColumns({ handleStatusToggle, restaurants, currency }),
+    [handleStatusToggle, restaurants, currency]
   );
 
   return (
@@ -54,6 +63,8 @@ export const MenuItemsDataView: React.FC<MenuItemsDataViewProps> = ({
           onClick={onClick}
           onEdit={onEdit}
           onDelete={onDelete}
+          onRecommendedToggle={handleRecommendedToggle}
+          currency={currency}
         />
       )}
       onItemClick={handleRowClick}

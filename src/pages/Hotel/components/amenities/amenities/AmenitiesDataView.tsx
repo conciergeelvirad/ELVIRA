@@ -12,6 +12,12 @@ interface AmenitiesDataViewProps {
   gridColumns: GridColumn[];
   onEdit: (amenity: Amenity) => void;
   onDelete: (amenity: Amenity) => void;
+  currency?: string;
+  handleRecommendedToggle?: (
+    id: string | number,
+    newValue: boolean,
+    fieldName?: "recommended" | "hotel_recommended"
+  ) => Promise<void>;
 }
 
 /**
@@ -28,6 +34,8 @@ export const AmenitiesDataView: React.FC<AmenitiesDataViewProps> = ({
   gridColumns,
   onEdit,
   onDelete,
+  currency,
+  handleRecommendedToggle,
 }) => {
   return (
     <GenericDataView<Amenity>
@@ -42,6 +50,8 @@ export const AmenitiesDataView: React.FC<AmenitiesDataViewProps> = ({
           onClick={onClick}
           onEdit={() => onEdit(amenity)}
           onDelete={() => onDelete(amenity)}
+          onRecommendedToggle={handleRecommendedToggle}
+          currency={currency}
         />
       )}
       onItemClick={handleRowClick}

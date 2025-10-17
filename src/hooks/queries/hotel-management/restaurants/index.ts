@@ -18,6 +18,10 @@ export type {
   RestaurantCreateData,
   RestaurantUpdateData,
   RestaurantDeletionData,
+  MenuItemInsert,
+  MenuItemUpdate,
+  MenuItemUpdateData,
+  MenuItemDeletionData,
 } from "./restaurant.types";
 
 // Constants exports
@@ -96,4 +100,7 @@ export {
   useDeleteRestaurant,
   useRestaurantMenuItems,
   useRestaurantDineInOrders,
+  useCreateMenuItem,
+  useUpdateMenuItem,
+  useDeleteMenuItem,
 } from "./useRestaurantQueries";

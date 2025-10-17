@@ -9,6 +9,7 @@ interface MenuItemCardProps {
   onEdit?: (menuItem: MenuItem) => void;
   onDelete?: (menuItem: MenuItem) => void;
   onRecommendedToggle?: (id: string, newValue: boolean) => Promise<void>;
+  currency?: string;
 }
 
 /**
@@ -23,6 +24,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   onEdit,
   onDelete,
   onRecommendedToggle,
+  currency = "$",
 }) => {
   const status = menuItem.is_active ? "Active" : "Inactive";
 
@@ -70,13 +72,20 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
                   newValue: !menuItem.hotel_recommended,
                 });
                 try {
-                  await onRecommendedToggle(menuItem.id, !menuItem.hotel_recommended);
+                  await onRecommendedToggle(
+                    menuItem.id,
+                    !menuItem.hotel_recommended
+                  );
                 } catch (error) {
                   console.error("❌ Recommended toggle failed:", error);
                 }
               }}
               className="hover:scale-110 transition-transform"
-              title={menuItem.hotel_recommended ? "Remove from recommended" : "Mark as recommended"}
+              title={
+                menuItem.hotel_recommended
+                  ? "Remove from recommended"
+                  : "Mark as recommended"
+              }
             >
               <Star
                 className={`w-4 h-4 flex-shrink-0 ${
@@ -102,7 +111,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
       }}
       price={{
         value: menuItem.price,
-        currency: "$",
+        currency: currency,
         className: "text-xl font-bold text-orange-600",
       }}
       sections={sections}

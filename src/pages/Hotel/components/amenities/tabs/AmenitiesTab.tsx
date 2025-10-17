@@ -27,6 +27,7 @@ interface AmenitiesTabProps {
   >;
   tableColumns: any;
   gridColumns: any;
+  currency?: string;
 }
 
 export const AmenitiesTab = ({
@@ -34,6 +35,7 @@ export const AmenitiesTab = ({
   crud,
   tableColumns,
   gridColumns,
+  currency,
 }: AmenitiesTabProps) => {
   const {
     searchAndFilter,
@@ -88,6 +90,7 @@ export const AmenitiesTab = ({
           }
           tableColumns={tableColumns}
           gridColumns={gridColumns}
+          currency={currency}
           onEdit={(amenity) => {
             formActions.setFormData({
               name: amenity.name,
@@ -102,6 +105,9 @@ export const AmenitiesTab = ({
           }}
           onDelete={(amenity) =>
             modalActions.openDeleteModal(enhanceAmenity(amenity))
+          }
+          handleRecommendedToggle={(id, newValue) =>
+            crud.handleRecommendedToggle(id, newValue, "recommended")
           }
         />
       )}

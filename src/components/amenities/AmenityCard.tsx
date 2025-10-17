@@ -8,6 +8,7 @@ interface AmenityCardProps {
   onDelete?: (amenity: Amenity) => void;
   onClick?: () => void;
   onRecommendedToggle?: (id: string, newValue: boolean) => Promise<void>;
+  currency?: string;
 }
 
 export const AmenityCard = ({
@@ -16,6 +17,7 @@ export const AmenityCard = ({
   onDelete,
   onClick,
   onRecommendedToggle,
+  currency = "$",
 }: AmenityCardProps) => {
   // Build sections for description and category
   const sections: Array<{
@@ -82,7 +84,11 @@ export const AmenityCard = ({
                 }
               }}
               className="hover:scale-110 transition-transform"
-              title={amenity.recommended ? "Remove from recommended" : "Mark as recommended"}
+              title={
+                amenity.recommended
+                  ? "Remove from recommended"
+                  : "Mark as recommended"
+              }
             >
               <Star
                 className={`w-4 h-4 flex-shrink-0 ${
@@ -102,7 +108,7 @@ export const AmenityCard = ({
       badge={statusBadge}
       price={{
         value: amenity.price,
-        currency: "$",
+        currency: currency,
         className: "text-xl font-bold text-green-600",
       }}
       sections={sections}

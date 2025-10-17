@@ -44,12 +44,14 @@ const getRestaurantNames = (
 interface GetColumnsOptions {
   handleStatusToggle: (id: string, newStatus: boolean) => void;
   restaurants: Restaurant[];
+  currency?: string;
 }
 
 // TABLE COLUMNS
 export const getMenuItemTableColumns = ({
   handleStatusToggle,
   restaurants,
+  currency = "$",
 }: GetColumnsOptions): Column<MenuItem>[] => [
   {
     key: "item",
@@ -78,7 +80,7 @@ export const getMenuItemTableColumns = ({
   {
     key: "price",
     header: "PRICE",
-    accessor: (item) => `$${item.price.toFixed(2)}`,
+    accessor: (item) => `${currency}${item.price.toFixed(2)}`,
   },
   {
     key: "is_active",

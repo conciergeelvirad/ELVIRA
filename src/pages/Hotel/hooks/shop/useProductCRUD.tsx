@@ -73,6 +73,9 @@ export const useProductCRUD = ({
           ...(data.is_active !== undefined && {
             is_active: data.is_active as boolean,
           }),
+          ...(data.recommended !== undefined && {
+            recommended: data.recommended as boolean,
+          }),
         },
       };
       console.log("🔄 transformUpdate PRODUCT:", { id, data, updatePayload });
@@ -99,6 +102,7 @@ export const useProductCRUD = ({
     formState: crud.formState,
     formActions: crud.formActions,
     handleStatusToggle: crud.handleStatusToggle,
+    handleRecommendedToggle: crud.handleRecommendedToggle,
     handleCreateSubmit: crud.handleCreateSubmit,
     handleEditSubmit: crud.handleEditSubmit,
     handleDeleteConfirm: crud.handleDeleteConfirm,

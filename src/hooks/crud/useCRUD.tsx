@@ -23,6 +23,8 @@ export interface UseCRUDOptions<T extends CRUDEntity> {
     update?: (id: string | number, data: Partial<T>) => Promise<void>;
     delete?: (id: string | number) => Promise<void>;
   };
+  // Table name for direct Supabase updates (to avoid query invalidation)
+  tableName?: string;
 }
 
 // Re-export types from useCRUDForm.ts to avoid importing them directly in this file
@@ -77,11 +79,16 @@ export const useCRUD = <T extends CRUDEntity>({
 }: UseCRUDOptions<T>): UseCRUDResult<T> => {
   // Main state for entities
   const [data, setData] = useState<T[]>(initialData);
+  const [isOptimisticallyUpdating, setIsOptimisticallyUpdating] =
+    useState(false);
 
   // Sync data when initialData changes (e.g., when API data loads)
+  // But skip if we're in the middle of an optimistic update
   useEffect(() => {
-    setData(initialData);
-  }, [initialData]);
+    if (!isOptimisticallyUpdating) {
+      setData(initialData);
+    }
+  }, [initialData, isOptimisticallyUpdating]);
 
   // Cast data for useSearchAndFilter compatibility
   const dataAsRecords = data as unknown as Record<string, unknown>[];
@@ -121,6 +128,9 @@ export const useCRUD = <T extends CRUDEntity>({
     });
 
     try {
+      // Mark that we're doing an optimistic update
+      setIsOptimisticallyUpdating(true);
+
       // Update local state immediately for optimistic UI
       setData((prevData) =>
         prevData.map((item) => {
@@ -147,6 +157,11 @@ export const useCRUD = <T extends CRUDEntity>({
       } as unknown as Partial<T>);
 
       console.log("✅ STATUS TOGGLE SUCCESS:", { entityId, newStatus });
+
+      // Clear the flag after a short delay to allow mutation to complete
+      setTimeout(() => {
+        setIsOptimisticallyUpdating(false);
+      }, 100);
     } catch (error) {
       console.error("❌ STATUS TOGGLE FAILED:", {
         entityId,
@@ -165,6 +180,7 @@ export const useCRUD = <T extends CRUDEntity>({
             : item
         )
       );
+      setIsOptimisticallyUpdating(false);
       throw error;
     }
   };
@@ -183,6 +199,9 @@ export const useCRUD = <T extends CRUDEntity>({
     });
 
     try {
+      // Mark that we're doing an optimistic update
+      setIsOptimisticallyUpdating(true);
+
       // Update local state immediately for optimistic UI
       setData((prevData) =>
         prevData.map((item) => {
@@ -208,6 +227,11 @@ export const useCRUD = <T extends CRUDEntity>({
       } as Partial<T>);
 
       console.log("✅ Recommended toggle completed successfully");
+
+      // Clear the flag after a short delay to allow mutation to complete
+      setTimeout(() => {
+        setIsOptimisticallyUpdating(false);
+      }, 100);
     } catch (error) {
       console.error("❌ Error toggling recommended status:", error);
       // Revert the optimistic update on error
@@ -221,6 +245,7 @@ export const useCRUD = <T extends CRUDEntity>({
             : item
         )
       );
+      setIsOptimisticallyUpdating(false);
       throw error;
     }
   };

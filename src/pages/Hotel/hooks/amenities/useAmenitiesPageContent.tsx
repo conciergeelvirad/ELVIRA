@@ -9,6 +9,7 @@ import {
 } from "../../components";
 import type { useAmenityCRUD } from "./useAmenityCRUD";
 import type { useAmenityRequestCRUD } from "./useAmenityRequestCRUD";
+import { useHotelStaff } from "../../../../components/common";
 
 interface UseAmenitiesPageContentProps {
   amenitiesLoading: boolean;
@@ -34,6 +35,9 @@ export const useAmenitiesPageContent = ({
   amenityCRUD,
   amenityRequestCRUD,
 }: UseAmenitiesPageContentProps): TabConfig[] => {
+  // Get hotel currency from context
+  const { currency } = useHotelStaff();
+
   // Extract CRUD actions for amenities
   const { handleStatusToggle: amenityStatusToggle } = amenityCRUD;
 
@@ -42,16 +46,18 @@ export const useAmenitiesPageContent = ({
     () =>
       getAmenityTableColumns({
         handleStatusToggle: amenityStatusToggle,
+        currency,
       }),
-    [amenityStatusToggle]
+    [amenityStatusToggle, currency]
   );
 
   const amenityGridColumns = React.useMemo(
     () =>
       getAmenityGridColumns({
         handleStatusToggle: amenityStatusToggle,
+        currency,
       }),
-    [amenityStatusToggle]
+    [amenityStatusToggle, currency]
   );
 
   // Get columns based on current state for amenity requests
@@ -68,9 +74,16 @@ export const useAmenitiesPageContent = ({
         crud={amenityCRUD}
         tableColumns={amenityTableColumns}
         gridColumns={amenityGridColumns}
+        currency={currency}
       />
     ),
-    [amenitiesLoading, amenityCRUD, amenityTableColumns, amenityGridColumns]
+    [
+      amenitiesLoading,
+      amenityCRUD,
+      amenityTableColumns,
+      amenityGridColumns,
+      currency,
+    ]
   );
 
   const requestsContent = React.useMemo(

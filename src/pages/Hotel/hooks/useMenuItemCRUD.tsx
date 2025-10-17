@@ -40,6 +40,7 @@ export const useMenuItemCRUD = ({
     formState: crud.formState,
     formActions: crud.formActions,
     handleStatusToggle: crud.handleStatusToggle,
+    handleRecommendedToggle: crud.handleRecommendedToggle,
     handleCreateSubmit: crud.handleCreateSubmit,
     handleEditSubmit: crud.handleEditSubmit,
     handleDeleteConfirm: crud.handleDeleteConfirm,

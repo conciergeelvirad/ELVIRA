@@ -15,6 +15,7 @@ interface ProductsDataViewProps {
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
   onView?: (product: Product) => void;
+  currency?: string;
 }
 
 /**
@@ -32,6 +33,7 @@ export const ProductsDataView: React.FC<ProductsDataViewProps> = ({
   onEdit,
   onDelete,
   handleRecommendedToggle,
+  currency,
 }) => {
   return (
     <GenericDataView<Product>
@@ -47,6 +49,7 @@ export const ProductsDataView: React.FC<ProductsDataViewProps> = ({
           onEdit={() => onEdit(product)}
           onDelete={() => onDelete(product)}
           onRecommendedToggle={handleRecommendedToggle}
+          currency={currency}
         />
       )}
       onItemClick={handleRowClick}
