@@ -92,6 +92,9 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
         tableColumns={tableColumns}
         gridColumns={gridColumns}
         handleStatusToggle={handleStatusToggle}
+        handleRecommendedToggle={(id, newValue) =>
+          crud.handleRecommendedToggle(id, newValue, "recommended")
+        }
         onEdit={(product) => {
           formActions.setFormData({
             name: product.name,

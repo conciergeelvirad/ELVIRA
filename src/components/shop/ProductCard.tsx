@@ -1,12 +1,13 @@
 import { type Product } from "../../hooks/queries/hotel-management/products";
 import { GenericCard, CardActionFooter } from "../common/data-display";
-import { Package } from "lucide-react";
+import { Package, Star } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
   onClick?: () => void;
   onEdit?: (product: Product) => void;
   onDelete?: (id: string) => void;
+  onRecommendedToggle?: (id: string, newValue: boolean) => Promise<void>;
 }
 
 export const ProductCard = ({
@@ -14,6 +15,7 @@ export const ProductCard = ({
   onClick,
   onEdit,
   onDelete,
+  onRecommendedToggle,
 }: ProductCardProps) => {
   // Build sections
   const sections: Array<{
@@ -63,7 +65,42 @@ export const ProductCard = ({
     <GenericCard
       image={product.image_url || undefined}
       imageFallback={<Package className="w-16 h-16 text-gray-400" />}
-      title={product.name}
+      title={
+        <div className="flex items-center gap-1">
+          {onRecommendedToggle && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                console.log("⭐ RECOMMENDED STAR CLICKED (Product):", {
+                  productId: product.id,
+                  productName: product.name,
+                  currentValue: product.recommended,
+                  newValue: !product.recommended,
+                });
+                try {
+                  await onRecommendedToggle(product.id, !product.recommended);
+                } catch (error) {
+                  console.error("❌ Recommended toggle failed:", error);
+                }
+              }}
+              className="hover:scale-110 transition-transform"
+              title={product.recommended ? "Remove from recommended" : "Mark as recommended"}
+            >
+              <Star
+                className={`w-4 h-4 flex-shrink-0 ${
+                  product.recommended
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-300"
+                }`}
+              />
+            </button>
+          )}
+          {!onRecommendedToggle && product.recommended && (
+            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+          )}
+          <span className="line-clamp-1">{product.name}</span>
+        </div>
+      }
       badge={statusBadge}
       price={{
         value: product.price,

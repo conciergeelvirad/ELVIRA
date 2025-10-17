@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu } from "lucide-react";
+import { Menu, Star } from "lucide-react";
 import type { MenuItem } from "../../hooks/queries/hotel-management/restaurants";
 import { GenericCard, CardActionFooter } from "../common/data-display";
 
@@ -8,6 +8,7 @@ interface MenuItemCardProps {
   onClick?: () => void;
   onEdit?: (menuItem: MenuItem) => void;
   onDelete?: (menuItem: MenuItem) => void;
+  onRecommendedToggle?: (id: string, newValue: boolean) => Promise<void>;
 }
 
 /**
@@ -21,6 +22,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
   onClick,
   onEdit,
   onDelete,
+  onRecommendedToggle,
 }) => {
   const status = menuItem.is_active ? "Active" : "Inactive";
 
@@ -55,7 +57,42 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({
     <GenericCard
       image={menuItem.image_url || undefined}
       imageFallback={<Menu className="w-16 h-16 text-gray-400" />}
-      title={<span className="line-clamp-1">{menuItem.name}</span>}
+      title={
+        <div className="flex items-center gap-1">
+          {onRecommendedToggle && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                console.log("⭐ RECOMMENDED STAR CLICKED (Menu Item):", {
+                  menuItemId: menuItem.id,
+                  menuItemName: menuItem.name,
+                  currentValue: menuItem.hotel_recommended,
+                  newValue: !menuItem.hotel_recommended,
+                });
+                try {
+                  await onRecommendedToggle(menuItem.id, !menuItem.hotel_recommended);
+                } catch (error) {
+                  console.error("❌ Recommended toggle failed:", error);
+                }
+              }}
+              className="hover:scale-110 transition-transform"
+              title={menuItem.hotel_recommended ? "Remove from recommended" : "Mark as recommended"}
+            >
+              <Star
+                className={`w-4 h-4 flex-shrink-0 ${
+                  menuItem.hotel_recommended
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-300"
+                }`}
+              />
+            </button>
+          )}
+          {!onRecommendedToggle && menuItem.hotel_recommended && (
+            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+          )}
+          <span className="line-clamp-1">{menuItem.name}</span>
+        </div>
+      }
       badge={{
         label: status,
         variant: "soft",

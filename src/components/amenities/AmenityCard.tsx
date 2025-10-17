@@ -1,12 +1,13 @@
 import { type Amenity } from "../../hooks/queries/hotel-management/amenities";
 import { GenericCard, CardActionFooter } from "../common/data-display";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Star } from "lucide-react";
 
 interface AmenityCardProps {
   amenity: Amenity;
   onEdit?: (amenity: Amenity) => void;
   onDelete?: (amenity: Amenity) => void;
   onClick?: () => void;
+  onRecommendedToggle?: (id: string, newValue: boolean) => Promise<void>;
 }
 
 export const AmenityCard = ({
@@ -14,6 +15,7 @@ export const AmenityCard = ({
   onEdit,
   onDelete,
   onClick,
+  onRecommendedToggle,
 }: AmenityCardProps) => {
   // Build sections for description and category
   const sections: Array<{
@@ -61,7 +63,42 @@ export const AmenityCard = ({
       image={amenity.image_url || undefined}
       imageFallback={<Sparkles className="w-16 h-16 text-purple-400" />}
       imageHeight="h-48"
-      title={amenity.name}
+      title={
+        <div className="flex items-center gap-1">
+          {onRecommendedToggle && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                console.log("⭐ RECOMMENDED STAR CLICKED (Amenity):", {
+                  amenityId: amenity.id,
+                  amenityName: amenity.name,
+                  currentValue: amenity.recommended,
+                  newValue: !amenity.recommended,
+                });
+                try {
+                  await onRecommendedToggle(amenity.id, !amenity.recommended);
+                } catch (error) {
+                  console.error("❌ Recommended toggle failed:", error);
+                }
+              }}
+              className="hover:scale-110 transition-transform"
+              title={amenity.recommended ? "Remove from recommended" : "Mark as recommended"}
+            >
+              <Star
+                className={`w-4 h-4 flex-shrink-0 ${
+                  amenity.recommended
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-300"
+                }`}
+              />
+            </button>
+          )}
+          {!onRecommendedToggle && amenity.recommended && (
+            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+          )}
+          <span className="line-clamp-1">{amenity.name}</span>
+        </div>
+      }
       badge={statusBadge}
       price={{
         value: amenity.price,

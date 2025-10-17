@@ -11,6 +11,7 @@ interface ProductsDataViewProps {
   tableColumns: Column<Product>[];
   gridColumns: GridColumn[];
   handleStatusToggle?: (id: string, checked: boolean) => void;
+  handleRecommendedToggle?: (id: string, newValue: boolean) => Promise<void>;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
   onView?: (product: Product) => void;
@@ -30,6 +31,7 @@ export const ProductsDataView: React.FC<ProductsDataViewProps> = ({
   gridColumns,
   onEdit,
   onDelete,
+  handleRecommendedToggle,
 }) => {
   return (
     <GenericDataView<Product>
@@ -44,6 +46,7 @@ export const ProductsDataView: React.FC<ProductsDataViewProps> = ({
           onClick={onClick}
           onEdit={() => onEdit(product)}
           onDelete={() => onDelete(product)}
+          onRecommendedToggle={handleRecommendedToggle}
         />
       )}
       onItemClick={handleRowClick}

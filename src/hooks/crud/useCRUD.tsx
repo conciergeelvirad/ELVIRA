@@ -47,6 +47,11 @@ export interface UseCRUDResult<T extends CRUDEntity> {
     entityId: string | number,
     newStatus: boolean
   ) => Promise<void>;
+  handleRecommendedToggle: (
+    entityId: string | number,
+    newRecommendedStatus: boolean,
+    fieldName?: "recommended" | "hotel_recommended"
+  ) => Promise<void>;
   handleCreateSubmit: () => Promise<void>;
   handleEditSubmit: () => Promise<void>;
   handleDeleteConfirm: () => Promise<void>;
@@ -164,6 +169,62 @@ export const useCRUD = <T extends CRUDEntity>({
     }
   };
 
+  // Handle recommended toggle (similar to status toggle)
+  const handleRecommendedToggle = async (
+    entityId: string | number,
+    newRecommendedStatus: boolean,
+    fieldName: "recommended" | "hotel_recommended" = "recommended"
+  ) => {
+    console.log("⭐ RECOMMENDED TOGGLE CALLED:", {
+      entityId,
+      newRecommendedStatus,
+      fieldName,
+      timestamp: new Date().toISOString(),
+    });
+
+    try {
+      // Update local state immediately for optimistic UI
+      setData((prevData) =>
+        prevData.map((item) => {
+          if (item.id === entityId) {
+            console.log("✅ Updating item recommended status:", {
+              id: item.id,
+              field: fieldName,
+              oldValue: (item as Record<string, unknown>)[fieldName],
+              newValue: newRecommendedStatus,
+            });
+            return {
+              ...item,
+              [fieldName]: newRecommendedStatus,
+            } as unknown as T;
+          }
+          return item;
+        })
+      );
+
+      // Call update operation with the recommended field
+      await crudOperations.update(entityId, {
+        [fieldName]: newRecommendedStatus,
+      } as Partial<T>);
+
+      console.log("✅ Recommended toggle completed successfully");
+    } catch (error) {
+      console.error("❌ Error toggling recommended status:", error);
+      // Revert the optimistic update on error
+      setData((prevData) =>
+        prevData.map((item) =>
+          item.id === entityId
+            ? ({
+                ...item,
+                [fieldName]: !newRecommendedStatus,
+              } as unknown as T)
+            : item
+        )
+      );
+      throw error;
+    }
+  };
+
   // Handle create submission
   const handleCreateSubmit = async () => {
     const newEntityData = formatNewEntity(formState.formData);
@@ -192,6 +253,7 @@ export const useCRUD = <T extends CRUDEntity>({
     formState,
     formActions,
     handleStatusToggle,
+    handleRecommendedToggle,
     handleCreateSubmit,
     handleEditSubmit,
     handleDeleteConfirm,
