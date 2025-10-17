@@ -36,7 +36,16 @@ export const AmenityCard = ({
     ),
   });
 
-  // Build additional badges (Recommended + Active status)
+  // Status badge - displayed over the image
+  const statusBadge = {
+    label: amenity.is_active ? "Active" : "Inactive",
+    variant: "soft" as const,
+    className: amenity.is_active
+      ? "bg-green-100 text-green-700"
+      : "bg-gray-100 text-gray-600",
+  };
+
+  // Additional badges (Recommended)
   const additionalBadges = [];
 
   if (amenity.hotel_recommended) {
@@ -47,20 +56,13 @@ export const AmenityCard = ({
     });
   }
 
-  additionalBadges.push({
-    label: amenity.is_active ? "Active" : "Inactive",
-    variant: "soft" as const,
-    className: amenity.is_active
-      ? "bg-green-100 text-green-700"
-      : "bg-gray-100 text-gray-600",
-  });
-
   return (
     <GenericCard
       image={amenity.image_url || undefined}
       imageFallback={<Sparkles className="w-16 h-16 text-purple-400" />}
       imageHeight="h-48"
       title={amenity.name}
+      badge={statusBadge}
       price={{
         value: amenity.price,
         currency: "$",

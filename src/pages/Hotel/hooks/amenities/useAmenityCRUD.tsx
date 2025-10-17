@@ -54,15 +54,27 @@ export const useAmenityCRUD = ({
       hotel_id: getHotelId(),
     }),
     // Transform form data to database update format
-    transformUpdate: (id, data) => ({
-      id: id as string,
-      name: data.name as string,
-      description: (data.description as string) || null,
-      category: data.category as string,
-      price: data.price as number,
-      is_active: data.is_active as boolean,
-      hotel_recommended: data.hotel_recommended as boolean,
-    }),
+    transformUpdate: (id, data) => {
+      const updatePayload = {
+        id: id as string,
+        ...(data.name !== undefined && { name: data.name as string }),
+        ...(data.description !== undefined && {
+          description: (data.description as string) || null,
+        }),
+        ...(data.category !== undefined && {
+          category: data.category as string,
+        }),
+        ...(data.price !== undefined && { price: data.price as number }),
+        ...(data.is_active !== undefined && {
+          is_active: data.is_active as boolean,
+        }),
+        ...(data.hotel_recommended !== undefined && {
+          hotel_recommended: data.hotel_recommended as boolean,
+        }),
+      };
+      console.log("🔄 transformUpdate AMENITY:", { id, data, updatePayload });
+      return updatePayload;
+    },
     // Transform ID for delete operation
     transformDelete: (id) => id as string,
     // Optional: Customize how new entities appear in local state

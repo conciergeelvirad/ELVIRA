@@ -10,8 +10,13 @@ import {
   SearchAndFilterBar,
   CRUDModalContainer,
 } from "../../../../../components/common";
-import { MenuItemsDataView, MENU_ITEM_FORM_FIELDS } from "../index";
+import {
+  MenuItemsDataView,
+  MenuItemDetail,
+  MENU_ITEM_FORM_FIELDS,
+} from "../index";
 import type { useMenuItemCRUD } from "../../../hooks/restaurant/useMenuItemCRUD";
+import { useRestaurants } from "../../../../../hooks/queries/hotel-management/restaurants/useRestaurantQueries";
 
 interface MenuItemsTabProps {
   hotelId: string;
@@ -19,6 +24,9 @@ interface MenuItemsTabProps {
 }
 
 export const MenuItemsTab = ({ hotelId, menuItemCRUD }: MenuItemsTabProps) => {
+  // Fetch restaurants for displaying restaurant names in the menu items table
+  const { data: restaurants = [] } = useRestaurants(hotelId);
+
   return (
     <>
       <SearchAndFilterBar
@@ -58,6 +66,8 @@ export const MenuItemsTab = ({ hotelId, menuItemCRUD }: MenuItemsTabProps) => {
           const enhancedItem = { ...item, hotel_id: hotelId };
           menuItemCRUD.modalActions.openDeleteModal(enhancedItem);
         }}
+        handleStatusToggle={menuItemCRUD.handleStatusToggle}
+        restaurants={restaurants}
       />
       <CRUDModalContainer
         modalState={menuItemCRUD.modalState}
@@ -69,6 +79,7 @@ export const MenuItemsTab = ({ hotelId, menuItemCRUD }: MenuItemsTabProps) => {
         onEditSubmit={menuItemCRUD.handleEditSubmit}
         onDeleteConfirm={menuItemCRUD.handleDeleteConfirm}
         entityName="Menu Item"
+        renderDetailContent={(item) => <MenuItemDetail menuItem={item} />}
       />
     </>
   );

@@ -7,7 +7,7 @@ import {
   useDineInOrderCRUD,
 } from "./hooks/restaurant";
 import { RESTAURANT_FORM_FIELDS } from "./components/restaurant/restaurant/RestaurantFormFields";
-import { MENU_ITEM_FORM_FIELDS } from "./components/restaurant/menu-items/MenuItemComponents";
+import { MENU_ITEM_FORM_FIELDS } from "./components/restaurant/menu-items/MenuItemFormFields";
 import { DINE_IN_ORDER_FORM_FIELDS } from "./components/restaurant/dine-in-orders/DineInOrderComponents";
 
 export const HotelRestaurantPage = () => {

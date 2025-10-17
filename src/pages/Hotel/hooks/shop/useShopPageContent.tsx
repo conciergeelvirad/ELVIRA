@@ -38,28 +38,15 @@ export const useShopPageContent = ({
   safeHotelId,
 }: UseShopPageContentProps): TabConfig[] => {
   // Extract CRUD actions for products
-  const {
-    modalActions: productModalActions,
-    formActions: productFormActions,
-    handleStatusToggle: productStatusToggle,
-  } = productCRUD;
-
-  // Extract CRUD actions for orders
-  const {
-    modalActions: orderModalActions,
-    formActions: orderFormActions,
-    handleStatusToggle: orderStatusToggle,
-  } = shopOrderCRUD;
+  const { handleStatusToggle: productStatusToggle } = productCRUD;
 
   // Get columns based on current state for products
   const productTableColumns = React.useMemo(
     () =>
       getProductTableColumns({
         handleStatusToggle: productStatusToggle,
-        modalActions: productModalActions,
-        formActions: productFormActions,
       }),
-    [productStatusToggle, productModalActions, productFormActions]
+    [productStatusToggle]
   );
 
   const productGridColumns = React.useMemo(
@@ -71,15 +58,7 @@ export const useShopPageContent = ({
   );
 
   // Get columns based on current state for orders
-  const orderTableColumns = React.useMemo(
-    () =>
-      getShopOrderTableColumns({
-        handleStatusToggle: orderStatusToggle,
-        modalActions: orderModalActions,
-        formActions: orderFormActions,
-      }),
-    [orderStatusToggle, orderModalActions, orderFormActions]
-  );
+  const orderTableColumns = React.useMemo(() => getShopOrderTableColumns(), []);
 
   const orderGridColumns = React.useMemo(() => getShopOrderGridColumns(), []);
 

@@ -8,7 +8,7 @@ export const LANGUAGE_TO_LOCALE_MAP: Record<string, string> = {
   english: "en-US",
   "english (us)": "en-US",
   "english (uk)": "en-GB",
-  
+
   // European languages
   spanish: "es-ES",
   french: "fr-FR",
@@ -28,7 +28,7 @@ export const LANGUAGE_TO_LOCALE_MAP: Record<string, string> = {
   greek: "el-GR",
   turkish: "tr-TR",
   russian: "ru-RU",
-  
+
   // Asian languages
   chinese: "zh-CN",
   "chinese (simplified)": "zh-CN",
@@ -40,7 +40,7 @@ export const LANGUAGE_TO_LOCALE_MAP: Record<string, string> = {
   indonesian: "id-ID",
   malay: "ms-MY",
   tagalog: "tl-PH",
-  
+
   // Middle Eastern & South Asian
   arabic: "ar-SA",
   hebrew: "he-IL",
@@ -55,7 +55,7 @@ export const LANGUAGE_TO_LOCALE_MAP: Record<string, string> = {
   kannada: "kn-IN",
   malayalam: "ml-IN",
   persian: "fa-IR",
-  
+
   // Other languages
   swahili: "sw-KE",
   zulu: "zu-ZA",
@@ -71,10 +71,10 @@ export const LANGUAGE_TO_LOCALE_MAP: Record<string, string> = {
 /**
  * Converts a language name to a proper locale code
  * Falls back to 'en-US' if language is not found
- * 
+ *
  * @param language - Language name (e.g., "spanish", "urdu", "english")
  * @returns Locale code (e.g., "es-ES", "ur-PK", "en-US")
- * 
+ *
  * @example
  * ```typescript
  * getLocaleFromLanguage("spanish") // Returns "es-ES"
@@ -89,23 +89,23 @@ export function getLocaleFromLanguage(language: string): string {
 
 /**
  * Formats a date in the guest's locale
- * 
+ *
  * @param date - Date to format
  * @param language - Guest's preferred language
  * @returns Formatted date string
- * 
+ *
  * @example
  * ```typescript
  * formatDateForLanguage(new Date(), "spanish")
  * // Returns: "17/10/2025, 10:01:03"
- * 
+ *
  * formatDateForLanguage(new Date(), "english")
  * // Returns: "10/17/2025, 10:01:03 AM"
  * ```
  */
 export function formatDateForLanguage(date: Date, language: string): string {
   const locale = getLocaleFromLanguage(language);
-  
+
   try {
     return date.toLocaleString(locale, {
       year: "numeric",
@@ -124,11 +124,11 @@ export function formatDateForLanguage(date: Date, language: string): string {
 
 /**
  * Formats a date as a short date string (no time)
- * 
+ *
  * @param date - Date to format
  * @param language - Guest's preferred language
  * @returns Formatted date string
- * 
+ *
  * @example
  * ```typescript
  * formatDateShort(new Date(), "french")
@@ -137,7 +137,7 @@ export function formatDateForLanguage(date: Date, language: string): string {
  */
 export function formatDateShort(date: Date, language: string): string {
   const locale = getLocaleFromLanguage(language);
-  
+
   try {
     return date.toLocaleDateString(locale, {
       year: "numeric",
@@ -152,11 +152,11 @@ export function formatDateShort(date: Date, language: string): string {
 
 /**
  * Formats a time string
- * 
+ *
  * @param date - Date to format
  * @param language - Guest's preferred language
  * @returns Formatted time string
- * 
+ *
  * @example
  * ```typescript
  * formatTimeForLanguage(new Date(), "german")
@@ -165,7 +165,7 @@ export function formatDateShort(date: Date, language: string): string {
  */
 export function formatTimeForLanguage(date: Date, language: string): string {
   const locale = getLocaleFromLanguage(language);
-  
+
   try {
     return date.toLocaleTimeString(locale, {
       hour: "2-digit",
@@ -180,7 +180,7 @@ export function formatTimeForLanguage(date: Date, language: string): string {
 
 /**
  * Validates if a locale is supported
- * 
+ *
  * @param language - Language to check
  * @returns true if language has a locale mapping
  */
@@ -191,7 +191,7 @@ export function isLanguageSupported(language: string): boolean {
 
 /**
  * Gets all supported languages
- * 
+ *
  * @returns Array of supported language names
  */
 export function getSupportedLanguages(): string[] {

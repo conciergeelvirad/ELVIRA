@@ -9,10 +9,16 @@ import type { Column } from "../../../../../types/table";
 import type { Restaurant } from "../../../../../hooks/queries/hotel-management/restaurants";
 import { StatusBadge } from "../../../../../components/common";
 
+interface GetColumnsOptions {
+  handleStatusToggle: (id: string, newStatus: boolean) => void;
+}
+
 /**
  * Table columns for restaurants
  */
-export const restaurantTableColumns: Column<Restaurant>[] = [
+export const getRestaurantTableColumns = ({
+  handleStatusToggle,
+}: GetColumnsOptions): Column<Restaurant>[] => [
   {
     key: "name",
     header: "Restaurant Name",
@@ -37,10 +43,24 @@ export const restaurantTableColumns: Column<Restaurant>[] = [
     key: "is_active",
     header: "Status",
     accessor: (restaurant) => (
-      <StatusBadge
-        status={restaurant.is_active ? "active" : "inactive"}
-        label={restaurant.is_active ? "Active" : "Inactive"}
-      />
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log("🖱️ RESTAURANT STATUS BADGE CLICKED:", {
+            restaurantId: restaurant.id,
+            currentStatus: restaurant.is_active,
+            newStatus: !restaurant.is_active,
+            restaurant: restaurant.name,
+          });
+          handleStatusToggle(restaurant.id, !restaurant.is_active);
+        }}
+        className="cursor-pointer"
+      >
+        <StatusBadge
+          status={restaurant.is_active ? "active" : "inactive"}
+          size="sm"
+        />
+      </div>
     ),
   },
 ];

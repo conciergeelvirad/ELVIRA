@@ -20,22 +20,29 @@ import { productKeys } from "./product.constants";
 // ============================================================================
 
 /**
- * Fetches all active products for a specific hotel
+ * Fetches all products for a specific hotel (both active and inactive)
  *
  * @param hotelId - ID of the hotel to fetch products for
- * @returns Query result with products array (active only)
+ * @returns Query result with products array (all products)
  */
 export const useProducts = (hotelId: string) => {
   return useQuery({
     queryKey: productKeys.list({ hotelId }),
     queryFn: async (): Promise<Product[]> => {
+      console.log("🔍 FETCHING PRODUCTS for hotel:", hotelId);
       const { data, error } = await supabase
         .from("products")
         .select("*")
         .eq("hotel_id", hotelId)
-        .eq("is_active", true);
+        .order("created_at", { ascending: false });
+      // Removed .eq("is_active", true) to show both active and inactive items
+      // Added stable ordering by created_at to prevent re-sorting on updates
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ FETCH PRODUCTS ERROR:", error);
+        throw error;
+      }
+      console.log("✅ FETCHED PRODUCTS:", data?.length, "items");
       return data || [];
     },
   });
@@ -81,8 +88,8 @@ export const useProductCategories = (hotelId: string) => {
       const { data, error } = await supabase
         .from("products")
         .select("category")
-        .eq("hotel_id", hotelId)
-        .eq("is_active", true);
+        .eq("hotel_id", hotelId);
+      // Removed .eq("is_active", true) to show all categories
 
       if (error) throw error;
 
@@ -94,7 +101,7 @@ export const useProductCategories = (hotelId: string) => {
 };
 
 /**
- * Fetches mini bar products for a hotel
+ * Fetches mini bar products for a hotel (both active and inactive)
  *
  * @param hotelId - ID of the hotel
  * @returns Query result with mini bar products array
@@ -107,8 +114,8 @@ export const useMiniBarProducts = (hotelId: string) => {
         .from("products")
         .select("*")
         .eq("hotel_id", hotelId)
-        .eq("is_active", true)
         .eq("mini_bar", true);
+      // Removed .eq("is_active", true) to show all mini bar products
 
       if (error) throw error;
       return data || [];
@@ -164,6 +171,7 @@ export const useUpdateProduct = () => {
       id,
       updates,
     }: ProductUpdateData): Promise<Product> => {
+      console.log("🔄 UPDATE PRODUCT MUTATION:", { id, updates });
       const { data, error } = await supabase
         .from("products")
         .update(updates)
@@ -171,10 +179,15 @@ export const useUpdateProduct = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ UPDATE PRODUCT ERROR:", error);
+        throw error;
+      }
+      console.log("✅ UPDATE PRODUCT SUCCESS:", data);
       return data;
     },
     onSuccess: (data) => {
+      console.log("🔄 INVALIDATING QUERIES after product update");
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
       queryClient.invalidateQueries({ queryKey: productKeys.detail(data.id) });
       queryClient.invalidateQueries({

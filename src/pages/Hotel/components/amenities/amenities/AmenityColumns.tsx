@@ -1,11 +1,7 @@
 import { Sparkles } from "lucide-react";
 import { Column, GridColumn } from "../../../../../types/table";
-import {
-  UnifiedToggle,
-  ActionButtonGroup,
-} from "../../../../../components/common";
+import { ItemWithImage, StatusBadge } from "../../../../../components/common";
 import { Amenity } from "../../../../../hooks/queries/hotel-management/amenities";
-import { CRUDModalActions, CRUDFormActions } from "../../../../../hooks";
 
 type EnhancedAmenity = Amenity & Record<string, unknown>;
 
@@ -16,25 +12,24 @@ export const enhanceAmenity = (amenity: Amenity): EnhancedAmenity => {
 
 interface GetColumnsOptions {
   handleStatusToggle: (id: string, newStatus: boolean) => void;
-  modalActions: CRUDModalActions<EnhancedAmenity>;
-  formActions: CRUDFormActions;
 }
 
 export const getTableColumns = ({
   handleStatusToggle,
-  modalActions,
-  formActions,
 }: GetColumnsOptions): Column<Amenity>[] => {
   return [
     {
-      key: "name",
-      header: "AMENITY NAME",
+      key: "amenity",
+      header: "AMENITY",
       sortable: true,
-      render: (value) => (
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-purple-600" />
-          <span className="font-medium text-gray-900">{value}</span>
-        </div>
+      render: (_value, amenity) => (
+        <ItemWithImage
+          imageUrl={amenity.image_url}
+          title={amenity.name}
+          description={amenity.description}
+          fallbackIcon={<Sparkles className="w-5 h-5" />}
+          isRecommended={amenity.recommended}
+        />
       ),
     },
     {
@@ -58,68 +53,25 @@ export const getTableColumns = ({
       ),
     },
     {
-      key: "hotel_recommended",
-      header: "RECOMMENDED",
-      sortable: true,
-      render: (value) => (
-        <span
-          className={`text-xs font-medium px-2 py-1 rounded ${
-            value ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          {value ? "YES" : "NO"}
-        </span>
-      ),
-    },
-    {
       key: "is_active",
-      header: "ACTIVE",
+      header: "STATUS",
       sortable: true,
       render: (value, amenity) => (
-        <div onClick={(e) => e.stopPropagation()}>
-          <UnifiedToggle
-            checked={value === true}
-            onChange={(checked) => handleStatusToggle(amenity.id, checked)}
-            variant="compact"
-            size="sm"
-          />
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log("🖱️ AMENITY STATUS BADGE CLICKED:", {
+              amenityId: amenity.id,
+              currentStatus: value,
+              newStatus: !value,
+              amenity: amenity.name,
+            });
+            handleStatusToggle(amenity.id, !value);
+          }}
+          className="cursor-pointer"
+        >
+          <StatusBadge status={value ? "active" : "inactive"} size="sm" />
         </div>
-      ),
-    },
-    {
-      key: "actions",
-      header: "ACTIONS",
-      render: (_, amenity) => (
-        <ActionButtonGroup
-          actions={[
-            {
-              type: "edit",
-              onClick: (e) => {
-                e.stopPropagation();
-                formActions.setFormData({
-                  name: amenity.name,
-                  description: amenity.description,
-                  category: amenity.category,
-                  price: amenity.price,
-                  hotel_recommended: amenity.hotel_recommended,
-                  is_active: amenity.is_active,
-                  image_url: amenity.image_url,
-                });
-                modalActions.openEditModal(enhanceAmenity(amenity));
-              },
-            },
-            {
-              type: "delete",
-              onClick: (e) => {
-                e.stopPropagation();
-                modalActions.openDeleteModal(enhanceAmenity(amenity));
-              },
-              variant: "danger",
-            },
-          ]}
-          size="sm"
-          compact
-        />
       ),
     },
   ];
@@ -127,7 +79,7 @@ export const getTableColumns = ({
 
 export const getGridColumns = ({
   handleStatusToggle,
-}: Pick<GetColumnsOptions, "handleStatusToggle">): GridColumn[] => {
+}: GetColumnsOptions): GridColumn[] => {
   return [
     {
       key: "name",
@@ -153,16 +105,27 @@ export const getGridColumns = ({
     },
     {
       key: "is_active",
-      label: "Active",
+      label: "Status",
       accessor: "is_active",
       render: (value: boolean, item: Amenity) => (
-        <div onClick={(e) => e.stopPropagation()}>
-          <UnifiedToggle
-            checked={value === true}
-            onChange={(checked) => handleStatusToggle(item.id, checked)}
-            variant="compact"
-            size="sm"
-          />
+        <div
+          onClick={async (e) => {
+            e.stopPropagation();
+            console.log("🖱️ STATUS BADGE CLICKED (Amenity Grid):", {
+              amenityId: item.id,
+              amenityName: item.name,
+              currentValue: value,
+              newValue: !value,
+            });
+            try {
+              await handleStatusToggle(item.id, !value);
+            } catch (error) {
+              console.error("❌ Status toggle failed:", error);
+            }
+          }}
+          className="cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          <StatusBadge status={value ? "active" : "inactive"} size="sm" />
         </div>
       ),
     },
@@ -179,7 +142,15 @@ export const getDetailFields = (amenity: Amenity) => [
     label: "Hotel Recommended",
     value: amenity.hotel_recommended ? "Yes" : "No",
   },
-  { label: "Active", value: amenity.is_active ? "Yes" : "No" },
+  {
+    label: "Status",
+    value: (
+      <StatusBadge
+        status={amenity.is_active ? "active" : "inactive"}
+        size="sm"
+      />
+    ),
+  },
   {
     label: "Created",
     value: amenity.created_at

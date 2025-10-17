@@ -43,7 +43,10 @@ export interface UseCRUDResult<T extends CRUDEntity> {
   modalActions: CRUDModalActions<EnhancedEntity<T>>;
   formState: CRUDFormState;
   formActions: CRUDFormActions;
-  handleStatusToggle: (entityId: string | number, newStatus: boolean) => void;
+  handleStatusToggle: (
+    entityId: string | number,
+    newStatus: boolean
+  ) => Promise<void>;
   handleCreateSubmit: () => Promise<void>;
   handleEditSubmit: () => Promise<void>;
   handleDeleteConfirm: () => Promise<void>;
@@ -102,20 +105,63 @@ export const useCRUD = <T extends CRUDEntity>({
   );
 
   // Handle status toggle (common functionality)
-  const handleStatusToggle = (
+  const handleStatusToggle = async (
     entityId: string | number,
     newStatus: boolean
   ) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === entityId
-          ? ({
+    console.log("🔄 STATUS TOGGLE CALLED:", {
+      entityId,
+      newStatus,
+      timestamp: new Date().toISOString(),
+    });
+
+    try {
+      // Update local state immediately for optimistic UI
+      setData((prevData) =>
+        prevData.map((item) => {
+          if (item.id === entityId) {
+            const itemWithStatus = item as Record<string, unknown>;
+            console.log("✅ Updating item in local state:", {
+              id: item.id,
+              oldIsActive: itemWithStatus.is_active,
+              newIsActive: newStatus,
+            });
+            return {
               ...item,
-              status: newStatus ? "ACTIVE" : "INACTIVE",
-            } as unknown as T)
-          : item
-      )
-    );
+              is_active: newStatus,
+              status: newStatus ? "ACTIVE" : "INACTIVE", // Keep status for backward compatibility
+            } as unknown as T;
+          }
+          return item;
+        })
+      );
+
+      // Call the update mutation to persist to database
+      await crudOperations.update(entityId, {
+        is_active: newStatus,
+      } as unknown as Partial<T>);
+
+      console.log("✅ STATUS TOGGLE SUCCESS:", { entityId, newStatus });
+    } catch (error) {
+      console.error("❌ STATUS TOGGLE FAILED:", {
+        entityId,
+        newStatus,
+        error,
+      });
+      // Revert the optimistic update on error
+      setData((prevData) =>
+        prevData.map((item) =>
+          item.id === entityId
+            ? ({
+                ...item,
+                is_active: !newStatus,
+                status: !newStatus ? "ACTIVE" : "INACTIVE",
+              } as unknown as T)
+            : item
+        )
+      );
+      throw error;
+    }
   };
 
   // Handle create submission

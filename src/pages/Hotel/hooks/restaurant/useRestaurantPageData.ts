@@ -39,11 +39,30 @@ export const useRestaurantPageData = () => {
     [restaurants]
   );
 
-  const { data: menuItems = [], isLoading: menuItemsLoading } =
+  const { data: rawMenuItems = [], isLoading: menuItemsLoading } =
     useRestaurantMenuItems(safeHotelId, defaultRestaurantId);
 
   const { data: dineInOrders = [], isLoading: ordersLoading } =
     useRestaurantDineInOrders(safeHotelId);
+
+  // Filter menu items to exclude those that belong ONLY to inactive restaurants
+  const menuItems = React.useMemo(() => {
+    if (!rawMenuItems.length || !restaurants.length) return rawMenuItems;
+
+    const activeRestaurantIds = new Set(
+      restaurants.filter((r) => r.is_active).map((r) => r.id)
+    );
+
+    return rawMenuItems.filter((item) => {
+      // If restaurant_ids is null or empty, item is available in all restaurants (keep it)
+      if (!item.restaurant_ids || item.restaurant_ids.length === 0) {
+        return true;
+      }
+
+      // Check if at least one of the item's restaurants is active
+      return item.restaurant_ids.some((id) => activeRestaurantIds.has(id));
+    });
+  }, [rawMenuItems, restaurants]);
 
   // Log the complete staff context when data changes
   React.useEffect(() => {

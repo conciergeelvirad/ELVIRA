@@ -24,6 +24,7 @@ HOTEL-ELVIRA/
 ## ✅ What Goes in `/docs`
 
 ### ✅ DO Store in `/docs`:
+
 - ✅ Implementation guides
 - ✅ Feature documentation
 - ✅ API integration docs
@@ -38,6 +39,7 @@ HOTEL-ELVIRA/
 - ✅ Change logs for major features
 
 ### ❌ DON'T Store in `/docs`:
+
 - ❌ Source code files (`.ts`, `.tsx`, `.js`)
 - ❌ Configuration files (`.json`, `.js` configs)
 - ❌ Build output
@@ -49,6 +51,7 @@ HOTEL-ELVIRA/
 Use descriptive, uppercase names with underscores:
 
 ### Good Examples:
+
 ```
 ✅ GUEST_AUTHENTICATION_GUIDE.md
 ✅ LANGUAGE_DROPDOWN_IMPLEMENTATION.md
@@ -58,6 +61,7 @@ Use descriptive, uppercase names with underscores:
 ```
 
 ### Bad Examples:
+
 ```
 ❌ docs.md (too generic)
 ❌ fix.md (not descriptive)
@@ -67,6 +71,7 @@ Use descriptive, uppercase names with underscores:
 ```
 
 ### Common Suffixes:
+
 - `_GUIDE.md` - How-to guides
 - `_COMPLETE.md` - Completed implementations
 - `_PLAN.md` - Planning documents
@@ -95,11 +100,13 @@ Why this feature/change was needed.
 ## ✅ Implementation
 
 ### What Was Done
+
 - List key changes
 - Implementation details
 - Files modified/created
 
 ### Technical Details
+
 Code examples, architecture decisions, etc.
 
 ## 🧪 Testing
@@ -129,14 +136,17 @@ Potential enhancements or next steps.
 ## 🔍 Before Creating New Documentation
 
 1. **Check if documentation already exists**
+
    - Search the [`INDEX.md`](./INDEX.md)
    - Use file search: `Ctrl+P` and type the feature name
 
 2. **Choose the right location**
+
    - All docs in `/docs` root unless archiving
    - Use `/docs/archive/` for deprecated docs
 
 3. **Use descriptive names**
+
    - Name should clearly indicate content
    - Use full words, not abbreviations (unless widely known)
 
@@ -147,26 +157,33 @@ Potential enhancements or next steps.
 ## 📚 Documentation Types
 
 ### 1. **Implementation Guides** (How to implement features)
+
 Example: `GUEST_AUTHENTICATION_IMPLEMENTATION.md`
 
 ### 2. **Quick References** (Fast lookup guides)
+
 Example: `AMADEUS_QUICK_REFERENCE.md`
 
 ### 3. **Complete Documentation** (Finished features)
+
 Example: `LANGUAGE_DROPDOWN_ENHANCEMENT_COMPLETE.md`
 
 ### 4. **Refactoring Plans** (Code improvement plans)
+
 Example: `CART_REFACTORING_PLAN.md`
 
 ### 5. **Bug Fixes** (Issue resolutions)
+
 Example: `LOCALE_FIX_QUICK_GUIDE.md`
 
 ### 6. **Integration Guides** (Third-party integrations)
+
 Example: `GOOGLE_PLACES_INTEGRATION.md`
 
 ## ✨ Best Practices
 
 ### DO:
+
 - ✅ Write clear, concise titles
 - ✅ Include code examples
 - ✅ Add status indicators (✅ ❌ 🚧)
@@ -178,6 +195,7 @@ Example: `GOOGLE_PLACES_INTEGRATION.md`
 - ✅ Document breaking changes clearly
 
 ### DON'T:
+
 - ❌ Create duplicate documentation
 - ❌ Use vague titles
 - ❌ Leave documents incomplete
@@ -212,7 +230,8 @@ Use these in your documentation:
 
 ## 🎯 Summary
 
-**Remember**: 
+**Remember**:
+
 - 📁 All docs in `/docs`
 - 📝 Descriptive names with underscores
 - ✅ Include status and dates

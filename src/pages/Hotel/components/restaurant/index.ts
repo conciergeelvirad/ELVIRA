@@ -5,14 +5,20 @@ export { RestaurantsDataView } from "./restaurant/RestaurantsDataView";
 export { RestaurantDetail } from "./restaurant/RestaurantDetail";
 export { RESTAURANT_FORM_FIELDS } from "./restaurant/RestaurantFormFields";
 export {
-  restaurantTableColumns,
+  getRestaurantTableColumns,
   restaurantGridColumns,
   restaurantDetailFields,
 } from "./restaurant/RestaurantColumns";
 
 // Menu Item components
-export { MenuItemsDataView } from "./menu-items/MenuItemComponents";
-export { MENU_ITEM_FORM_FIELDS } from "./menu-items/MenuItemComponents";
+export { MenuItemsDataView } from "./menu-items/MenuItemsDataView";
+export { MenuItemDetail } from "./menu-items/MenuItemDetail";
+export { MENU_ITEM_FORM_FIELDS } from "./menu-items/MenuItemFormFields";
+export {
+  getMenuItemTableColumns,
+  menuItemGridColumns,
+  menuItemDetailFields,
+} from "./menu-items/MenuItemColumns";
 
 // Dine-In Order components
 export { DineInOrdersDataView } from "./dine-in-orders/DineInOrderComponents";

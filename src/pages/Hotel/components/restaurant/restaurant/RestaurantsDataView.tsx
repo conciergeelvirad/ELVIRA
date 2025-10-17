@@ -4,14 +4,14 @@
  * Renders restaurants in table or grid view with pagination and action handlers.
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   GenericDataView,
   GenericCard,
   CardActionFooter,
 } from "../../../../../components/common/data-display";
 import {
-  restaurantTableColumns,
+  getRestaurantTableColumns,
   restaurantGridColumns,
 } from "./RestaurantColumns";
 import type { Restaurant } from "../../../../../hooks/queries/hotel-management/restaurants";
@@ -23,6 +23,7 @@ interface RestaurantsDataViewProps {
   handleRowClick: (restaurant: Restaurant) => void;
   onEdit: (restaurant: Restaurant) => void;
   onDelete: (restaurant: Restaurant) => void;
+  handleStatusToggle: (id: string, newStatus: boolean) => void;
 }
 
 /**
@@ -85,12 +86,18 @@ export const RestaurantsDataView: React.FC<RestaurantsDataViewProps> = ({
   handleRowClick,
   onEdit,
   onDelete,
+  handleStatusToggle,
 }) => {
+  const tableColumns = useMemo(
+    () => getRestaurantTableColumns({ handleStatusToggle }),
+    [handleStatusToggle]
+  );
+
   return (
     <GenericDataView<Restaurant>
       viewMode={viewMode}
       filteredData={filteredData}
-      tableColumns={restaurantTableColumns}
+      tableColumns={tableColumns}
       gridColumns={restaurantGridColumns}
       getItemId={(restaurant) => restaurant.id}
       renderCard={(restaurant, onClick) => (

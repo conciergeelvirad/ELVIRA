@@ -55,17 +55,29 @@ export const useProductCRUD = ({
       hotel_id: getHotelId(),
     }),
     // Transform form data to database update format
-    transformUpdate: (id, data) => ({
-      id: id as string,
-      updates: {
-        name: data.name as string,
-        description: (data.description as string) || undefined,
-        category: data.category as string,
-        price: data.price as number,
-        stock_quantity: data.stock_quantity as number,
-        is_available: data.is_available as boolean,
-      },
-    }),
+    transformUpdate: (id, data) => {
+      const updatePayload = {
+        id: id as string,
+        updates: {
+          ...(data.name !== undefined && { name: data.name as string }),
+          ...(data.description !== undefined && {
+            description: (data.description as string) || undefined,
+          }),
+          ...(data.category !== undefined && {
+            category: data.category as string,
+          }),
+          ...(data.price !== undefined && { price: data.price as number }),
+          ...(data.stock_quantity !== undefined && {
+            stock_quantity: data.stock_quantity as number,
+          }),
+          ...(data.is_active !== undefined && {
+            is_active: data.is_active as boolean,
+          }),
+        },
+      };
+      console.log("🔄 transformUpdate PRODUCT:", { id, data, updatePayload });
+      return updatePayload;
+    },
     // Transform ID for delete operation
     transformDelete: (id) => id as string,
     // Optional: Customize how new entities appear in local state

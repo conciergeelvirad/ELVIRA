@@ -1,11 +1,7 @@
 import { Package } from "lucide-react";
 import { Column, GridColumn } from "../../../../../types/table";
-import {
-  ActionButtonGroup,
-  StatusBadge,
-} from "../../../../../components/common";
+import { StatusBadge } from "../../../../../components/common";
 import { ShopOrder } from "../../../../../hooks/queries/hotel-management/shop-orders";
-import { CRUDModalActions, CRUDFormActions } from "../../../../../hooks";
 
 type EnhancedShopOrder = ShopOrder & Record<string, unknown>;
 
@@ -13,12 +9,6 @@ type EnhancedShopOrder = ShopOrder & Record<string, unknown>;
 export const enhanceShopOrder = (order: ShopOrder): EnhancedShopOrder => {
   return order as unknown as EnhancedShopOrder;
 };
-
-interface GetColumnsOptions {
-  handleStatusToggle: (id: string, newStatus: boolean) => void;
-  modalActions: CRUDModalActions<EnhancedShopOrder>;
-  formActions: CRUDFormActions;
-}
 
 // Helper to map order status to StatusBadge status type
 const mapOrderStatus = (
@@ -38,11 +28,7 @@ const mapOrderStatus = (
   }
 };
 
-export const getTableColumns = ({
-  handleStatusToggle,
-  modalActions,
-  formActions,
-}: GetColumnsOptions): Column<ShopOrder>[] => {
+export const getTableColumns = (): Column<ShopOrder>[] => {
   return [
     {
       key: "id",
@@ -102,48 +88,6 @@ export const getTableColumns = ({
           status={mapOrderStatus(String(value))}
           label={String(value).toUpperCase()}
           variant="soft"
-        />
-      ),
-    },
-    {
-      key: "actions",
-      header: "ACTIONS",
-      render: (_, order) => (
-        <ActionButtonGroup
-          actions={[
-            {
-              type: "view",
-              onClick: (e) => {
-                e.stopPropagation();
-                modalActions.openDetailModal(enhanceShopOrder(order));
-              },
-            },
-            {
-              type: "edit",
-              onClick: (e) => {
-                e.stopPropagation();
-                formActions.setFormData({
-                  guest_id: order.guest_id,
-                  delivery_date: order.delivery_date,
-                  delivery_time: order.delivery_time,
-                  total_price: order.total_price,
-                  status: order.status,
-                  special_instructions: order.special_instructions,
-                });
-                modalActions.openEditModal(enhanceShopOrder(order));
-              },
-            },
-            {
-              type: "delete",
-              onClick: (e) => {
-                e.stopPropagation();
-                modalActions.openDeleteModal(enhanceShopOrder(order));
-              },
-              variant: "danger",
-            },
-          ]}
-          size="sm"
-          compact
         />
       ),
     },

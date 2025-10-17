@@ -1,11 +1,7 @@
 import { ShoppingBag } from "lucide-react";
 import { Column, GridColumn } from "../../../../../types/table";
-import {
-  UnifiedToggle,
-  ActionButtonGroup,
-} from "../../../../../components/common";
+import { ItemWithImage, StatusBadge } from "../../../../../components/common";
 import { Product } from "../../../../../hooks/queries/hotel-management/products";
-import { CRUDModalActions, CRUDFormActions } from "../../../../../hooks";
 
 type EnhancedProduct = Product & Record<string, unknown>;
 
@@ -16,25 +12,25 @@ export const enhanceProduct = (product: Product): EnhancedProduct => {
 
 interface GetColumnsOptions {
   handleStatusToggle: (id: string, newStatus: boolean) => void;
-  modalActions: CRUDModalActions<EnhancedProduct>;
-  formActions: CRUDFormActions;
 }
 
 export const getTableColumns = ({
   handleStatusToggle,
-  modalActions,
-  formActions,
 }: GetColumnsOptions): Column<Product>[] => {
   return [
     {
-      key: "name",
-      header: "PRODUCT NAME",
+      key: "product",
+      header: "PRODUCT",
       sortable: true,
-      render: (value) => (
-        <div className="flex items-center gap-2">
-          <ShoppingBag className="w-4 h-4 text-blue-600" />
-          <span className="font-medium text-gray-900">{value}</span>
-        </div>
+      render: (_value, product) => (
+        <ItemWithImage
+          imageUrl={product.image_url}
+          title={product.name}
+          description={product.description}
+          fallbackIcon={<ShoppingBag className="w-5 h-5" />}
+          isRecommended={product.recommended}
+          badge={product.mini_bar ? "MINI BAR" : undefined}
+        />
       ),
     },
     {
@@ -77,52 +73,24 @@ export const getTableColumns = ({
     },
     {
       key: "is_active",
-      header: "ACTIVE",
+      header: "STATUS",
       sortable: true,
       render: (value, product) => (
-        <div onClick={(e) => e.stopPropagation()}>
-          <UnifiedToggle
-            checked={value === true}
-            onChange={(checked) => handleStatusToggle(product.id, checked)}
-            variant="compact"
-            size="sm"
-          />
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log("🖱️ PRODUCT STATUS BADGE CLICKED:", {
+              productId: product.id,
+              currentStatus: value,
+              newStatus: !value,
+              product: product.name,
+            });
+            handleStatusToggle(product.id, !value);
+          }}
+          className="cursor-pointer"
+        >
+          <StatusBadge status={value ? "active" : "inactive"} size="sm" />
         </div>
-      ),
-    },
-    {
-      key: "actions",
-      header: "ACTIONS",
-      render: (_, product) => (
-        <ActionButtonGroup
-          actions={[
-            {
-              type: "edit",
-              onClick: (e) => {
-                e.stopPropagation();
-                formActions.setFormData({
-                  name: product.name,
-                  description: product.description,
-                  category: product.category,
-                  price: product.price,
-                  stock_quantity: product.stock_quantity,
-                  image_url: product.image_url,
-                });
-                modalActions.openEditModal(enhanceProduct(product));
-              },
-            },
-            {
-              type: "delete",
-              onClick: (e) => {
-                e.stopPropagation();
-                modalActions.openDeleteModal(enhanceProduct(product));
-              },
-              variant: "danger",
-            },
-          ]}
-          size="sm"
-          compact
-        />
       ),
     },
   ];
@@ -130,7 +98,7 @@ export const getTableColumns = ({
 
 export const getGridColumns = ({
   handleStatusToggle,
-}: Pick<GetColumnsOptions, "handleStatusToggle">): GridColumn[] => {
+}: GetColumnsOptions): GridColumn[] => {
   return [
     {
       key: "name",
@@ -155,15 +123,28 @@ export const getGridColumns = ({
     },
     {
       key: "is_active",
-      label: "Active",
+      label: "Status",
       accessor: "is_active",
       render: (value: boolean, item: Product) => (
-        <UnifiedToggle
-          checked={value}
-          onChange={(checked) => handleStatusToggle(item.id, checked)}
-          variant="compact"
-          size="sm"
-        />
+        <div
+          onClick={async (e) => {
+            e.stopPropagation();
+            console.log("🖱️ STATUS BADGE CLICKED (Product Grid):", {
+              productId: item.id,
+              productName: item.name,
+              currentValue: value,
+              newValue: !value,
+            });
+            try {
+              await handleStatusToggle(item.id, !value);
+            } catch (error) {
+              console.error("❌ Status toggle failed:", error);
+            }
+          }}
+          className="cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          <StatusBadge status={value ? "active" : "inactive"} size="sm" />
+        </div>
       ),
     },
   ];
@@ -179,7 +160,15 @@ export const getDetailFields = (product: Product) => [
     label: "Stock Quantity",
     value: product.stock_quantity?.toString() || "0",
   },
-  { label: "Active", value: product.is_active ? "Yes" : "No" },
+  {
+    label: "Status",
+    value: (
+      <StatusBadge
+        status={product.is_active ? "active" : "inactive"}
+        size="sm"
+      />
+    ),
+  },
   {
     label: "Created",
     value: product.created_at

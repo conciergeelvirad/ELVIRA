@@ -1,4 +1,7 @@
-import { getSupportedLanguages, LANGUAGE_TO_LOCALE_MAP } from "./languageToLocale";
+import {
+  getSupportedLanguages,
+  LANGUAGE_TO_LOCALE_MAP,
+} from "./languageToLocale";
 
 export interface LanguageOption {
   value: string;
@@ -11,18 +14,61 @@ export interface LanguageOption {
  * Categorizes languages for better UI organization
  */
 function categorizeLanguage(language: string): LanguageOption["category"] {
-  const popularLanguages = ["english", "spanish", "french", "german", "chinese", "japanese", "arabic"];
+  const popularLanguages = [
+    "english",
+    "spanish",
+    "french",
+    "german",
+    "chinese",
+    "japanese",
+    "arabic",
+  ];
   const europeanLanguages = [
-    "italian", "portuguese", "dutch", "swedish", "norwegian", "danish", "finnish",
-    "polish", "czech", "hungarian", "romanian", "greek", "turkish", "russian",
-    "ukrainian", "bulgarian", "croatian", "serbian", "slovak", "slovenian"
+    "italian",
+    "portuguese",
+    "dutch",
+    "swedish",
+    "norwegian",
+    "danish",
+    "finnish",
+    "polish",
+    "czech",
+    "hungarian",
+    "romanian",
+    "greek",
+    "turkish",
+    "russian",
+    "ukrainian",
+    "bulgarian",
+    "croatian",
+    "serbian",
+    "slovak",
+    "slovenian",
   ];
   const asianLanguages = [
-    "chinese", "japanese", "korean", "thai", "vietnamese", "indonesian", "malay", "tagalog"
+    "chinese",
+    "japanese",
+    "korean",
+    "thai",
+    "vietnamese",
+    "indonesian",
+    "malay",
+    "tagalog",
   ];
   const middleEasternLanguages = [
-    "arabic", "hebrew", "hindi", "bengali", "urdu", "punjabi", "tamil", "telugu",
-    "marathi", "gujarati", "kannada", "malayalam", "persian"
+    "arabic",
+    "hebrew",
+    "hindi",
+    "bengali",
+    "urdu",
+    "punjabi",
+    "tamil",
+    "telugu",
+    "marathi",
+    "gujarati",
+    "kannada",
+    "malayalam",
+    "persian",
   ];
 
   if (popularLanguages.includes(language)) return "popular";
@@ -38,7 +84,7 @@ function categorizeLanguage(language: string): LanguageOption["category"] {
 function formatLanguageName(language: string): string {
   return language
     .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
 
@@ -47,13 +93,15 @@ function formatLanguageName(language: string): string {
  */
 export function getLanguageOptions(): LanguageOption[] {
   const languages = getSupportedLanguages();
-  
-  return languages.map(lang => ({
-    value: lang,
-    label: formatLanguageName(lang),
-    locale: LANGUAGE_TO_LOCALE_MAP[lang],
-    category: categorizeLanguage(lang),
-  })).sort((a, b) => a.label.localeCompare(b.label));
+
+  return languages
+    .map((lang) => ({
+      value: lang,
+      label: formatLanguageName(lang),
+      locale: LANGUAGE_TO_LOCALE_MAP[lang],
+      category: categorizeLanguage(lang),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 }
 
 /**
@@ -61,13 +109,13 @@ export function getLanguageOptions(): LanguageOption[] {
  */
 export function getGroupedLanguageOptions() {
   const options = getLanguageOptions();
-  
+
   return {
-    popular: options.filter(opt => opt.category === "popular"),
-    european: options.filter(opt => opt.category === "european"),
-    asian: options.filter(opt => opt.category === "asian"),
-    middleEastern: options.filter(opt => opt.category === "middle-eastern"),
-    other: options.filter(opt => opt.category === "other"),
+    popular: options.filter((opt) => opt.category === "popular"),
+    european: options.filter((opt) => opt.category === "european"),
+    asian: options.filter((opt) => opt.category === "asian"),
+    middleEastern: options.filter((opt) => opt.category === "middle-eastern"),
+    other: options.filter((opt) => opt.category === "other"),
   };
 }
 
@@ -90,7 +138,7 @@ export function getPopularLanguages(): LanguageOption[] {
     "russian",
   ];
 
-  return getLanguageOptions().filter(opt => 
+  return getLanguageOptions().filter((opt) =>
     popularLangList.includes(opt.value)
   );
 }

@@ -21,6 +21,12 @@ export interface CardImageProps {
   imageFallback?: React.ReactNode;
   /** Optional badge to display over the image */
   badge?: CardBadge;
+  /** Optional price to display over the image */
+  price?: {
+    value: number;
+    currency?: string;
+    className?: string;
+  };
   /** Render function for badge */
   onRenderBadge: (badge: CardBadge) => React.ReactNode;
 }
@@ -31,6 +37,7 @@ export const CardImage: React.FC<CardImageProps> = ({
   imageAlt,
   imageFallback,
   badge,
+  price,
   onRenderBadge,
 }) => {
   const [imageError, setImageError] = useState(false);
@@ -71,9 +78,23 @@ export const CardImage: React.FC<CardImageProps> = ({
         </div>
       )}
 
-      {/* Badge positioned inside image for image cards */}
+      {/* Badge positioned top-right over image */}
       {badge && (
         <div className="absolute top-2 right-2">{onRenderBadge(badge)}</div>
+      )}
+
+      {/* Price positioned bottom-left over image with backdrop */}
+      {price && (
+        <div className="absolute bottom-2 left-2">
+          <div
+            className={`backdrop-blur-sm bg-white/90 px-3 py-1.5 rounded-lg shadow-md ${
+              price.className || "text-xl font-bold text-green-600"
+            }`}
+          >
+            {price.currency || "$"}
+            {price.value.toFixed(2)}
+          </div>
+        </div>
       )}
     </div>
   );

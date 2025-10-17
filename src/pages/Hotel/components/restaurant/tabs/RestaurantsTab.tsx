@@ -32,6 +32,7 @@ export const RestaurantsTab: React.FC<RestaurantsTabProps> = ({
     modalActions,
     formState,
     formActions,
+    handleStatusToggle,
     handleCreateSubmit,
     handleEditSubmit,
     handleDeleteConfirm,
@@ -78,6 +79,7 @@ export const RestaurantsTab: React.FC<RestaurantsTabProps> = ({
         handleRowClick={modalActions.openDetailModal}
         onEdit={modalActions.openEditModal}
         onDelete={modalActions.openDeleteModal}
+        handleStatusToggle={handleStatusToggle}
       />
 
       <CRUDModalContainer

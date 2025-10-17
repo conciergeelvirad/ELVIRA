@@ -1,6 +1,6 @@
 /**
  * Localization Utilities
- * 
+ *
  * This module provides utilities for converting between language names and locale codes,
  * and formatting dates/times in different locales.
  */

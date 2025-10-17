@@ -124,14 +124,18 @@ export function useCRUDWithMutations<
     formatUpdatedEntity: formatUpdatedEntity as any,
     customOperations: {
       create: async (data) => {
+        console.log("🔄 useCRUDWithMutations: CREATE operation", data);
         const createData = transformCreate(data);
         await createMutation.mutateAsync(createData);
       },
       update: async (id, data) => {
+        console.log("🔄 useCRUDWithMutations: UPDATE operation", { id, data });
         const updateData = transformUpdate(id as string, data);
+        console.log("🔄 Transformed update data:", updateData);
         await updateMutation.mutateAsync(updateData);
       },
       delete: async (id) => {
+        console.log("🔄 useCRUDWithMutations: DELETE operation", id);
         const deleteParam = transformDelete
           ? transformDelete(id as string)
           : (id as string);

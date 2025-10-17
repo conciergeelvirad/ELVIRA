@@ -17,3 +17,4 @@ export * from "./TableView";
 export * from "./GenericDataView";
 export * from "./GenericCard";
 export * from "./CardActionFooter";
+export * from "./ItemWithImage";

@@ -35,25 +35,15 @@ export const useAmenitiesPageContent = ({
   amenityRequestCRUD,
 }: UseAmenitiesPageContentProps): TabConfig[] => {
   // Extract CRUD actions for amenities
-  const {
-    modalActions: amenityModalActions,
-    formActions: amenityFormActions,
-    handleStatusToggle: amenityStatusToggle,
-  } = amenityCRUD;
-
-  // Extract CRUD actions for requests
-  const { modalActions: requestModalActions, formActions: requestFormActions } =
-    amenityRequestCRUD;
+  const { handleStatusToggle: amenityStatusToggle } = amenityCRUD;
 
   // Get columns based on current state for amenities
   const amenityTableColumns = React.useMemo(
     () =>
       getAmenityTableColumns({
         handleStatusToggle: amenityStatusToggle,
-        modalActions: amenityModalActions,
-        formActions: amenityFormActions,
       }),
-    [amenityStatusToggle, amenityModalActions, amenityFormActions]
+    [amenityStatusToggle]
   );
 
   const amenityGridColumns = React.useMemo(
@@ -66,13 +56,8 @@ export const useAmenitiesPageContent = ({
 
   // Get columns based on current state for amenity requests
   const requestTableColumns = React.useMemo(
-    () =>
-      getAmenityRequestTableColumns({
-        handleStatusToggle: () => {},
-        modalActions: requestModalActions,
-        formActions: requestFormActions,
-      }),
-    [requestModalActions, requestFormActions]
+    () => getAmenityRequestTableColumns(),
+    []
   );
 
   // Generate tab content with proper memoization

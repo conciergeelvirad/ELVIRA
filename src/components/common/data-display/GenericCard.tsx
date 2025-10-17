@@ -124,20 +124,21 @@ export const GenericCard: React.FC<GenericCardProps> = ({
           imageAlt={imageAlt}
           imageFallback={imageFallback}
           badge={badge}
+          price={price}
           onRenderBadge={renderBadge}
         />
       )}
 
       {/* Content section - flex-1 makes it take remaining space */}
       <div className="p-4 sm:p-6 flex flex-col flex-1">
-        {/* Header with title, subtitle, price, and badge (for non-image cards) */}
+        {/* Header with title, subtitle, and badge (for non-image cards only) */}
         <CardHeader
           title={title}
           subtitle={subtitle}
           icon={icon}
           iconBgColor={iconBgColor}
           badge={badge}
-          price={price}
+          price={undefined} // Price now shown on image overlay
           hasImage={!!image}
           onRenderBadge={renderBadge}
         />

@@ -7,6 +7,10 @@ import { Menu, Tag, DollarSign } from "lucide-react";
 import React from "react";
 import { FormFieldConfig } from "../../../../../hooks";
 import { StatusBadge } from "../../../../../components/common";
+import {
+  ItemDetailView,
+  ItemDetailField,
+} from "../../../../../components/common/detail-view";
 import { Column } from "../../../../../types/table";
 import type { MenuItem } from "../../../../../hooks/queries/hotel-management/restaurants";
 
@@ -74,99 +78,32 @@ export const menuItemDetailFields = [
 ];
 
 // DETAIL
-export const MenuItemDetail = ({ menuItem }: { menuItem: MenuItem }) => (
-  <div className="grid grid-cols-1 gap-4">
-    {menuItemDetailFields.map((field) => {
-      const Icon = field.icon;
-      const value =
-        typeof field.accessor === "function"
-          ? field.accessor(menuItem)
-          : menuItem[field.key as keyof MenuItem];
-      return (
-        <div key={field.key} className="flex items-start space-x-3">
-          {Icon && (
-            <div className="mt-1">
-              <Icon className="w-5 h-5 text-gray-400" />
-            </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-500">{field.label}</p>
-            <p className="mt-1 text-sm text-gray-900 break-words">
-              {String(value)}
-            </p>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-);
+export const MenuItemDetail = ({ menuItem }: { menuItem: MenuItem }) => {
+  // Convert menuItemDetailFields to ItemDetailField format
+  const fields: ItemDetailField[] = menuItemDetailFields.map((field) => {
+    const value =
+      typeof field.accessor === "function"
+        ? field.accessor(menuItem)
+        : menuItem[field.key as keyof MenuItem];
 
-// DATAVIEW
-import {
-  GenericDataView,
-  GenericCard,
-  CardActionFooter,
-} from "../../../../../components/common/data-display";
-
-/**
- * Menu Item Card Component for Grid View - IMAGE CARD
- */
-const MenuItemCard: React.FC<{
-  item: MenuItem;
-  onClick: () => void;
-  onEdit?: (item: MenuItem) => void;
-  onDelete?: (item: MenuItem) => void;
-}> = ({ item, onClick, onEdit, onDelete }) => {
-  const status = item.is_available ? "Available" : "Unavailable";
-
-  // Build sections for content area
-  const sections: Array<{
-    icon?: React.ReactNode;
-    content: React.ReactNode;
-    className?: string;
-  }> = [];
-
-  sections.push({
-    content: (
-      <span className="inline-block text-sm bg-gray-100 px-2 py-1 rounded">
-        {item.category}
-      </span>
-    ),
+    return {
+      label: field.label,
+      value: value,
+    };
   });
 
-  if (item.description) {
-    sections.push({
-      content: (
-        <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
-      ),
-    });
-  }
-
   return (
-    <GenericCard
-      image={item.image_url || undefined}
-      imageFallback={<Menu className="w-16 h-16 text-gray-400" />}
-      title={<span className="line-clamp-1">{item.name}</span>}
-      badge={{
-        label: status,
-        variant: "soft",
-      }}
-      price={{
-        value: item.price,
-        currency: "$",
-        className: "text-xl font-bold text-orange-600",
-      }}
-      sections={sections}
-      footer={
-        <CardActionFooter
-          onEdit={onEdit ? () => onEdit(item) : undefined}
-          onDelete={onDelete ? () => onDelete(item) : undefined}
-        />
-      }
-      onClick={onClick}
+    <ItemDetailView
+      imageUrl={menuItem.image_url}
+      imageName={menuItem.name}
+      fields={fields}
     />
   );
 };
+
+// DATAVIEW
+import { GenericDataView } from "../../../../../components/common/data-display";
+import { MenuItemCard } from "../../../../../components/restaurant";
 
 export const MenuItemsDataView: React.FC<{
   viewMode: "list" | "grid";
@@ -184,7 +121,7 @@ export const MenuItemsDataView: React.FC<{
       getItemId={(item) => item.id}
       renderCard={(item, onClick) => (
         <MenuItemCard
-          item={item}
+          menuItem={item}
           onClick={onClick}
           onEdit={onEdit}
           onDelete={onDelete}

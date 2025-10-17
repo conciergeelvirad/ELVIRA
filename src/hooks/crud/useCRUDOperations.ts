@@ -47,11 +47,16 @@ export const useCRUDOperations = <T extends { id: string | number }>(
       setIsLoading(true);
       setError(null);
 
+      console.log("🔄 useCRUDOperations.update START:", { id, data });
+
       try {
         if (customOperations?.update) {
+          console.log("🔄 Calling custom update operation");
           await customOperations.update(id, data);
+          console.log("✅ Custom update operation completed");
         } else {
           // Default update logic (local state only)
+          console.log("🔄 Using default local state update");
           setItems(
             items.map((item) => (item.id === id ? { ...item, ...data } : item))
           );

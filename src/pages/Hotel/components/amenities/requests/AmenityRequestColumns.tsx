@@ -1,8 +1,6 @@
 import { Calendar, Clock } from "lucide-react";
 import { Column, GridColumn } from "../../../../../types/table";
-import { ActionButtonGroup } from "../../../../../components/common";
 import { AmenityRequest } from "../../../../../hooks/queries/hotel-management/amenity-requests";
-import { CRUDModalActions, CRUDFormActions } from "../../../../../hooks";
 
 type EnhancedAmenityRequest = AmenityRequest & Record<string, unknown>;
 
@@ -12,12 +10,6 @@ export const enhanceAmenityRequest = (
 ): EnhancedAmenityRequest => {
   return request as unknown as EnhancedAmenityRequest;
 };
-
-interface GetColumnsOptions {
-  handleStatusToggle: (id: string, newStatus: boolean) => void;
-  modalActions: CRUDModalActions<EnhancedAmenityRequest>;
-  formActions: CRUDFormActions;
-}
 
 // Helper to get status badge color
 const getStatusColor = (status: string) => {
@@ -35,10 +27,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export const getTableColumns = ({
-  modalActions,
-  formActions,
-}: GetColumnsOptions): Column<AmenityRequest>[] => {
+export const getTableColumns = (): Column<AmenityRequest>[] => {
   return [
     {
       key: "request_date",
@@ -95,41 +84,6 @@ export const getTableColumns = ({
         <span className="text-sm text-gray-600 truncate max-w-xs">
           {value || "-"}
         </span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "ACTIONS",
-      render: (_, request) => (
-        <ActionButtonGroup
-          actions={[
-            {
-              type: "edit",
-              onClick: (e) => {
-                e.stopPropagation();
-                formActions.setFormData({
-                  amenity_id: request.amenity_id,
-                  guest_id: request.guest_id,
-                  request_date: request.request_date,
-                  request_time: request.request_time,
-                  status: request.status,
-                  special_instructions: request.special_instructions,
-                });
-                modalActions.openEditModal(enhanceAmenityRequest(request));
-              },
-            },
-            {
-              type: "delete",
-              onClick: (e) => {
-                e.stopPropagation();
-                modalActions.openDeleteModal(enhanceAmenityRequest(request));
-              },
-              variant: "danger",
-            },
-          ]}
-          size="sm"
-          compact
-        />
       ),
     },
   ];

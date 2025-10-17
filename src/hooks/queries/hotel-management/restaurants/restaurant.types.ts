@@ -29,8 +29,9 @@ export interface MenuItem {
   service_type: string[] | null;
   special_type: string[] | null;
   restaurant_ids: string[];
-  is_available: boolean;
+  is_active: boolean; // Changed from is_available to match database schema
   image_url: string | null;
+  hotel_recommended: boolean | null;
   created_at: string | null;
   updated_at: string | null;
   created_by: string | null;

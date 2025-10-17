@@ -4,12 +4,14 @@ import { Package } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
+  onClick?: () => void;
   onEdit?: (product: Product) => void;
   onDelete?: (id: string) => void;
 }
 
 export const ProductCard = ({
   product,
+  onClick,
   onEdit,
   onDelete,
 }: ProductCardProps) => {
@@ -48,11 +50,21 @@ export const ProductCard = ({
     });
   }
 
+  // Build badge for status (shows over image)
+  const statusBadge = {
+    label: product.is_active ? "Active" : "Inactive",
+    variant: "soft" as const,
+    className: product.is_active
+      ? "bg-green-100 text-green-700"
+      : "bg-gray-100 text-gray-600",
+  };
+
   return (
     <GenericCard
       image={product.image_url || undefined}
       imageFallback={<Package className="w-16 h-16 text-gray-400" />}
       title={product.name}
+      badge={statusBadge}
       price={{
         value: product.price,
         currency: "€",
@@ -65,10 +77,7 @@ export const ProductCard = ({
           onDelete={onDelete ? () => onDelete(product.id) : undefined}
         />
       }
-      onClick={() => {
-        // Card click handler - could trigger onEdit here
-        if (onEdit) onEdit(product);
-      }}
+      onClick={onClick}
       disableHover={false}
     />
   );

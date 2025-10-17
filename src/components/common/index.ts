@@ -7,6 +7,7 @@ export * from "./crud";
 export * from "./layout";
 export * from "./grid";
 export * from "./detail";
+export * from "./detail-view";
 
 // Standalone components
 export { NotificationBadge } from "./NotificationBadge";
