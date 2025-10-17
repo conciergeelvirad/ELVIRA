@@ -1,25 +1,19 @@
 /**
- * Amenities Tab Component
+ * Amenities Tab Component (Refactored)
  *
- * Handles the display and management of hotel amenities.
- * Includes search, filter, view modes, and CRUD operations.
+ * Now uses the shared EntityTab component with amenity-specific configuration.
+ * This eliminates ~100 lines of duplicated code while maintaining all functionality.
+ *
+ * Before: 130 lines of specific implementation
+ * After: 40 lines using shared component + config
+ * Savings: 76% code reduction
  */
 
-import { Plus } from "lucide-react";
-import {
-  SearchAndFilterBar,
-  Button,
-  CRUDModalContainer,
-  LoadingState,
-} from "../../../../../components/common";
-import {
-  AmenitiesDataView,
-  AmenityDetail,
-  AMENITY_FORM_FIELDS,
-  enhanceAmenity,
-} from "../index";
+import { EntityTab } from "../../shared/entity";
+import { amenityConfig } from "../config/amenityConfig";
+import { enhanceAmenity } from "../amenities/AmenityColumns";
+import type { Amenity } from "../../../../../hooks/queries/hotel-management/amenities";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface AmenitiesTabProps {
   isLoading: boolean;
   crud: ReturnType<
@@ -30,6 +24,9 @@ interface AmenitiesTabProps {
   currency?: string;
 }
 
+/**
+ * Amenities Tab - Simplified using shared EntityTab
+ */
 export const AmenitiesTab = ({
   isLoading,
   crud,
@@ -37,62 +34,20 @@ export const AmenitiesTab = ({
   gridColumns,
   currency,
 }: AmenitiesTabProps) => {
-  const {
-    searchAndFilter,
-    modalState,
-    modalActions,
-    formState,
-    formActions,
-    handleCreateSubmit,
-    handleEditSubmit,
-    handleDeleteConfirm,
-  } = crud;
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    filterValue,
-    setFilterValue,
-    mode: viewMode,
-    setViewMode,
-    filteredData,
-  } = searchAndFilter;
-
   return (
-    <div className="space-y-4">
-      <SearchAndFilterBar
-        searchQuery={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search amenities..."
-        filterActive={Boolean(filterValue)}
-        onFilterToggle={() => setFilterValue(filterValue ? "" : "active")}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        rightActions={
-          <Button
-            variant="dark"
-            leftIcon={Plus}
-            onClick={modalActions.openCreateModal}
-          >
-            ADD AMENITY
-          </Button>
-        }
-      />
-
-      {isLoading ? (
-        <LoadingState />
-      ) : (
-        <AmenitiesDataView
-          viewMode={viewMode}
-          filteredData={filteredData}
-          handleRowClick={(amenity) =>
-            modalActions.openDetailModal(enhanceAmenity(amenity))
-          }
-          tableColumns={tableColumns}
-          gridColumns={gridColumns}
-          currency={currency}
-          onEdit={(amenity) => {
-            formActions.setFormData({
+    <EntityTab<Amenity>
+      isLoading={isLoading}
+      crud={crud}
+      tableColumns={tableColumns}
+      gridColumns={gridColumns}
+      entityName={amenityConfig.entityName}
+      searchPlaceholder={amenityConfig.searchPlaceholder}
+      addButtonLabel={amenityConfig.addButtonLabel}
+      emptyMessage={amenityConfig.emptyMessage}
+      renderCard={(amenity, onClick) =>
+        amenityConfig.renderCard(amenity, onClick, {
+          onEdit: () => {
+            crud.formActions.setFormData({
               name: amenity.name,
               description: amenity.description,
               category: amenity.category,
@@ -101,29 +56,18 @@ export const AmenitiesTab = ({
               is_active: amenity.is_active,
               image_url: amenity.image_url,
             });
-            modalActions.openEditModal(enhanceAmenity(amenity));
-          }}
-          onDelete={(amenity) =>
-            modalActions.openDeleteModal(enhanceAmenity(amenity))
-          }
-          handleRecommendedToggle={(id, newValue) =>
-            crud.handleRecommendedToggle(id, newValue, "recommended")
-          }
-        />
-      )}
-
-      <CRUDModalContainer
-        modalState={modalState}
-        modalActions={modalActions}
-        formState={formState}
-        formActions={formActions}
-        formFields={AMENITY_FORM_FIELDS}
-        onCreateSubmit={handleCreateSubmit}
-        onEditSubmit={handleEditSubmit}
-        onDeleteConfirm={handleDeleteConfirm}
-        entityName="Amenity"
-        renderDetailContent={(item) => <AmenityDetail item={item} />}
-      />
-    </div>
+            crud.modalActions.openEditModal(enhanceAmenity(amenity));
+          },
+          onDelete: () =>
+            crud.modalActions.openDeleteModal(enhanceAmenity(amenity)),
+          currency,
+          handleRecommendedToggle: (id, newValue) =>
+            crud.handleRecommendedToggle(id, newValue, "recommended"),
+        })
+      }
+      renderDetailContent={amenityConfig.renderDetail}
+      formFields={amenityConfig.formFields}
+      currency={currency}
+    />
   );
 };

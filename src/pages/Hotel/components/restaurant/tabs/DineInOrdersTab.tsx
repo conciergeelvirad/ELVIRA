@@ -1,13 +1,16 @@
 /**
- * DineInOrdersTab Component
+ * DineInOrdersTab Component (Refactored)
  *
- * Simplified tab component for managing dine-in orders
+ * Manages dine-in orders with:
+ * - Search and filter functionality
+ * - List view mode
+ * - CRUD operations (edit, delete, view)
+ *
+ * @refactored Uses OrdersTabTemplate for consistent orders management
  */
 
-import {
-  SearchAndFilterBar,
-  CRUDModalContainer,
-} from "../../../../../components/common";
+import React from "react";
+import { OrdersTabTemplate } from "../../shared/orders/OrdersTabTemplate";
 import {
   DineInOrdersDataView,
   DINE_IN_ORDER_FORM_FIELDS,
@@ -26,11 +29,14 @@ interface DineInOrdersTabProps {
   dineInOrderCRUD: ReturnType<typeof useDineInOrderCRUD>;
 }
 
-export const DineInOrdersTab = ({
+/**
+ * Dine-In Orders Tab - Simplified using OrdersTabTemplate
+ */
+export const DineInOrdersTab: React.FC<DineInOrdersTabProps> = ({
   hotelId,
   restaurants,
   dineInOrderCRUD,
-}: DineInOrdersTabProps) => {
+}) => {
   // Helper to enhance order with required fields for modals
   const enhanceOrder = (
     order: DineInOrderWithDetails
@@ -53,63 +59,37 @@ export const DineInOrdersTab = ({
     },
     restaurant:
       order.restaurant ||
-      restaurants.find((r) => r.id === order.restaurant_id) ||
+      restaurants.find((r) => r.id === order.restaurant?.id) ||
       null,
   });
 
   return (
-    <>
-      <SearchAndFilterBar
-        searchQuery={dineInOrderCRUD.searchAndFilter.searchTerm}
-        onSearchChange={dineInOrderCRUD.searchAndFilter.setSearchTerm}
-        searchPlaceholder="Search orders..."
-        filterActive={Boolean(dineInOrderCRUD.searchAndFilter.filterValue)}
-        onFilterToggle={() =>
-          dineInOrderCRUD.searchAndFilter.setFilterValue(
-            dineInOrderCRUD.searchAndFilter.filterValue ? "" : "pending"
-          )
-        }
-        viewMode={dineInOrderCRUD.searchAndFilter.mode}
-        onViewModeChange={dineInOrderCRUD.searchAndFilter.setViewMode}
-      />
-      <DineInOrdersDataView
-        viewMode={dineInOrderCRUD.searchAndFilter.mode}
-        filteredData={dineInOrderCRUD.searchAndFilter.filteredData}
-        handleRowClick={(order) => {
-          dineInOrderCRUD.modalActions.openDetailModal(
-            enhanceOrder(order) as any
-          );
-        }}
-        onEdit={(order) => {
-          dineInOrderCRUD.modalActions.openEditModal(
-            enhanceOrder(order) as any
-          );
-        }}
-        onDelete={(order) =>
-          dineInOrderCRUD.modalActions.openDeleteModal(
-            enhanceOrder(order) as any
-          )
-        }
-      />
-      <CRUDModalContainer
-        modalState={dineInOrderCRUD.modalState}
-        modalActions={dineInOrderCRUD.modalActions}
-        formState={dineInOrderCRUD.formState}
-        formActions={dineInOrderCRUD.formActions}
-        formFields={DINE_IN_ORDER_FORM_FIELDS}
-        editFormFields={DINE_IN_ORDER_EDIT_FORM_FIELDS}
-        onCreateSubmit={dineInOrderCRUD.handleCreateSubmit}
-        onEditSubmit={dineInOrderCRUD.handleEditSubmit}
-        onDeleteConfirm={dineInOrderCRUD.handleDeleteConfirm}
-        entityName="Dine-In Order"
-        renderDetailContent={(item) => {
-          console.log(
-            "📋 [DineInOrdersTab] renderDetailContent called with item:",
-            item
-          );
-          return <DineInOrderDetail item={item as any} />;
-        }}
-      />
-    </>
+    <OrdersTabTemplate<DineInOrderWithDetails>
+      isLoading={false}
+      crud={dineInOrderCRUD}
+      entityName="Dine-In Order"
+      searchPlaceholder="Search orders..."
+      defaultFilterValue="pending"
+      emptyMessage="No dine-in orders found"
+      formFields={DINE_IN_ORDER_FORM_FIELDS}
+      editFormFields={DINE_IN_ORDER_EDIT_FORM_FIELDS}
+      renderDataView={(viewMode, filteredData, handlers) => (
+        <DineInOrdersDataView
+          viewMode={viewMode}
+          filteredData={filteredData}
+          handleRowClick={(order: DineInOrderWithDetails) => {
+            handlers.onView(enhanceOrder(order));
+          }}
+          onEdit={(order: DineInOrderWithDetails) => {
+            handlers.onEdit(enhanceOrder(order));
+          }}
+          onDelete={(order: DineInOrderWithDetails) => {
+            handlers.onDelete(enhanceOrder(order));
+          }}
+        />
+      )}
+      renderDetailContent={(item) => <DineInOrderDetail item={item} />}
+      loadingMessage="Loading dine-in orders..."
+    />
   );
 };

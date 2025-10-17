@@ -1,17 +1,14 @@
 import React from "react";
-import { Plus } from "lucide-react";
-import {
-  SearchAndFilterBar,
-  Button,
-  CRUDModalContainer,
-  LoadingState,
-} from "../../../../../components/common";
-import { RestaurantsDataView, RESTAURANT_FORM_FIELDS } from "../index";
 import type { useRestaurantCRUD } from "../../../hooks/restaurant/useRestaurantCRUD";
+import { EntityTab } from "../../shared";
+import { restaurantEntityConfig } from "../config/restaurantConfig";
+import type { Restaurant } from "../../../../../hooks/queries/hotel-management/restaurants";
 
 interface RestaurantsTabProps {
   isLoading: boolean;
   crud: ReturnType<typeof useRestaurantCRUD>;
+  tableColumns: any;
+  gridColumns: any;
 }
 
 /**
@@ -21,78 +18,33 @@ interface RestaurantsTabProps {
  * - Search and filter functionality
  * - Grid/List view modes
  * - CRUD operations (create, edit, delete, view)
+ *
+ * @refactored Uses shared EntityTab component with restaurant-specific configuration
  */
 export const RestaurantsTab: React.FC<RestaurantsTabProps> = ({
   isLoading,
   crud,
+  tableColumns,
+  gridColumns,
 }) => {
-  const {
-    searchAndFilter,
-    modalState,
-    modalActions,
-    formState,
-    formActions,
-    handleStatusToggle,
-    handleCreateSubmit,
-    handleEditSubmit,
-    handleDeleteConfirm,
-  } = crud;
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    filterValue,
-    setFilterValue,
-    mode: viewMode,
-    setViewMode,
-    filteredData,
-  } = searchAndFilter;
-
-  if (isLoading) {
-    return <LoadingState message="Loading restaurants..." />;
-  }
-
   return (
-    <div className="space-y-4">
-      <SearchAndFilterBar
-        searchQuery={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search restaurants..."
-        filterActive={Boolean(filterValue)}
-        onFilterToggle={() => setFilterValue(filterValue ? "" : "active")}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        rightActions={
-          <Button
-            variant="dark"
-            leftIcon={Plus}
-            onClick={modalActions.openCreateModal}
-          >
-            Add Restaurant
-          </Button>
-        }
-      />
-
-      <RestaurantsDataView
-        viewMode={viewMode}
-        filteredData={filteredData}
-        handleRowClick={modalActions.openDetailModal}
-        onEdit={modalActions.openEditModal}
-        onDelete={modalActions.openDeleteModal}
-        handleStatusToggle={handleStatusToggle}
-      />
-
-      <CRUDModalContainer
-        modalState={modalState}
-        modalActions={modalActions}
-        formState={formState}
-        formActions={formActions}
-        formFields={RESTAURANT_FORM_FIELDS}
-        onCreateSubmit={handleCreateSubmit}
-        onEditSubmit={handleEditSubmit}
-        onDeleteConfirm={handleDeleteConfirm}
-        entityName="Restaurant"
-      />
-    </div>
+    <EntityTab<Restaurant>
+      isLoading={isLoading}
+      crud={crud}
+      tableColumns={tableColumns}
+      gridColumns={gridColumns}
+      entityName={restaurantEntityConfig.entityName}
+      searchPlaceholder={restaurantEntityConfig.searchPlaceholder}
+      addButtonLabel={restaurantEntityConfig.addButtonLabel}
+      emptyMessage={restaurantEntityConfig.emptyMessage}
+      renderCard={(restaurant, onClick) =>
+        restaurantEntityConfig.renderCard(restaurant, onClick, {
+          onEdit: () => crud.modalActions.openEditModal(restaurant),
+          onDelete: () => crud.modalActions.openDeleteModal(restaurant),
+        })
+      }
+      renderDetailContent={restaurantEntityConfig.renderDetail}
+      formFields={restaurantEntityConfig.formFields}
+    />
   );
 };

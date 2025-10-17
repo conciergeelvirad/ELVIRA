@@ -4,11 +4,14 @@ import {
   RestaurantsTab,
   MenuItemsTab,
   DineInOrdersTab,
+  getRestaurantTableColumns,
+  restaurantGridColumns,
 } from "../../components/restaurant";
 import type { useRestaurantCRUD } from "./useRestaurantCRUD";
 import type { useMenuItemCRUD } from "./useMenuItemCRUD";
 import type { useDineInOrderCRUD } from "./useDineInOrderCRUD";
 import type { Restaurant } from "../../../../hooks/queries/hotel-management/restaurants";
+import { useMemo } from "react";
 
 interface UseRestaurantPageContentProps {
   restaurantsLoading: boolean;
@@ -37,6 +40,15 @@ export const useRestaurantPageContent = ({
   safeHotelId,
   restaurants,
 }: UseRestaurantPageContentProps): TabConfig[] => {
+  // Generate table columns with status toggle handler
+  const restaurantTableColumns = useMemo(
+    () =>
+      getRestaurantTableColumns({
+        handleStatusToggle: restaurantCRUD.handleStatusToggle,
+      }),
+    [restaurantCRUD.handleStatusToggle]
+  );
+
   // Return tab configuration array directly without deep memoization
   // React is efficient enough to handle this, and memoizing CRUD objects causes infinite loops
   return [
@@ -45,7 +57,12 @@ export const useRestaurantPageContent = ({
       label: "Restaurants",
       icon: UtensilsCrossed,
       content: (
-        <RestaurantsTab isLoading={restaurantsLoading} crud={restaurantCRUD} />
+        <RestaurantsTab
+          isLoading={restaurantsLoading}
+          crud={restaurantCRUD}
+          tableColumns={restaurantTableColumns}
+          gridColumns={restaurantGridColumns}
+        />
       ),
     },
     {

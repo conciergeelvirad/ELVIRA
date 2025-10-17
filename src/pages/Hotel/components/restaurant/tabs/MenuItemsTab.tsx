@@ -1,98 +1,92 @@
 /**
  * MenuItemsTab Component
  *
- * Simplified tab component for managing restaurant menu items
+ * Manages restaurant menu items with:
+ * - Search and filter functionality
+ * - Grid/List view modes
+ * - CRUD operations (create, edit, delete, view)
+ * - Recommended toggle functionality
+ *
+ * @refactored Uses shared EntityTab component with menu-item-specific configuration
  */
 
-import { Plus } from "lucide-react";
-import {
-  Button,
-  SearchAndFilterBar,
-  CRUDModalContainer,
-  useHotelStaff,
-} from "../../../../../components/common";
-import {
-  MenuItemsDataView,
-  MenuItemDetail,
-  MENU_ITEM_FORM_FIELDS,
-} from "../index";
+import React, { useMemo } from "react";
+import { useHotelStaff } from "../../../../../components/common";
+import { EntityTab } from "../../shared";
+import { MenuItemCard } from "../../../../../components/restaurant";
+import { MenuItemDetail, MENU_ITEM_FORM_FIELDS } from "../index";
+import type { MenuItem } from "../../../../../hooks/queries/hotel-management/restaurants";
 import type { useMenuItemCRUD } from "../../../hooks/restaurant/useMenuItemCRUD";
 import { useRestaurants } from "../../../../../hooks/queries/hotel-management/restaurants/useRestaurantQueries";
+import {
+  getMenuItemTableColumns,
+  menuItemGridColumns,
+} from "../menu-items/MenuItemColumns";
 
 interface MenuItemsTabProps {
   hotelId: string;
   menuItemCRUD: ReturnType<typeof useMenuItemCRUD>;
 }
 
-export const MenuItemsTab = ({ hotelId, menuItemCRUD }: MenuItemsTabProps) => {
+/**
+ * Menu Items Tab - Simplified using shared EntityTab
+ */
+export const MenuItemsTab: React.FC<MenuItemsTabProps> = ({
+  hotelId,
+  menuItemCRUD,
+}) => {
   // Get hotel currency from context
   const { currency } = useHotelStaff();
 
   // Fetch restaurants for displaying restaurant names in the menu items table
   const { data: restaurants = [] } = useRestaurants(hotelId);
 
+  // Generate table columns with dependencies
+  const menuItemTableColumns = useMemo(
+    () =>
+      getMenuItemTableColumns({
+        handleStatusToggle: menuItemCRUD.handleStatusToggle,
+        restaurants,
+        currency,
+      }),
+    [menuItemCRUD.handleStatusToggle, restaurants, currency]
+  );
+
   return (
-    <>
-      <SearchAndFilterBar
-        searchQuery={menuItemCRUD.searchAndFilter.searchTerm}
-        onSearchChange={menuItemCRUD.searchAndFilter.setSearchTerm}
-        searchPlaceholder="Search menu items..."
-        filterActive={Boolean(menuItemCRUD.searchAndFilter.filterValue)}
-        onFilterToggle={() =>
-          menuItemCRUD.searchAndFilter.setFilterValue(
-            menuItemCRUD.searchAndFilter.filterValue ? "" : "active"
-          )
-        }
-        viewMode={menuItemCRUD.searchAndFilter.mode}
-        onViewModeChange={menuItemCRUD.searchAndFilter.setViewMode}
-        rightActions={
-          <Button
-            variant="dark"
-            leftIcon={Plus}
-            onClick={menuItemCRUD.modalActions.openCreateModal}
-          >
-            Add Menu Item
-          </Button>
-        }
-      />
-      <MenuItemsDataView
-        viewMode={menuItemCRUD.searchAndFilter.mode}
-        filteredData={menuItemCRUD.searchAndFilter.filteredData}
-        handleRowClick={(item) => {
-          const enhancedItem = { ...item, hotel_id: hotelId };
-          menuItemCRUD.modalActions.openDetailModal(enhancedItem);
-        }}
-        onEdit={(item) => {
-          const enhancedItem = { ...item, hotel_id: hotelId };
-          menuItemCRUD.modalActions.openEditModal(enhancedItem);
-        }}
-        onDelete={(item) => {
-          const enhancedItem = { ...item, hotel_id: hotelId };
-          menuItemCRUD.modalActions.openDeleteModal(enhancedItem);
-        }}
-        handleStatusToggle={menuItemCRUD.handleStatusToggle}
-        restaurants={restaurants}
-        currency={currency}
-        handleRecommendedToggle={(id, newValue) =>
-          menuItemCRUD.handleRecommendedToggle(
-            id,
-            newValue,
-            "hotel_recommended"
-          )
-        }
-      />
-      <CRUDModalContainer
-        modalState={menuItemCRUD.modalState}
-        modalActions={menuItemCRUD.modalActions}
-        formState={menuItemCRUD.formState}
-        formActions={menuItemCRUD.formActions}
-        formFields={MENU_ITEM_FORM_FIELDS}
-        onCreateSubmit={menuItemCRUD.handleCreateSubmit}
-        onEditSubmit={menuItemCRUD.handleEditSubmit}
-        onDeleteConfirm={menuItemCRUD.handleDeleteConfirm}
-        entityName="Menu Item"
-        renderDetailContent={(item) => <MenuItemDetail menuItem={item} />}
-      />
-    </>
+    <EntityTab<MenuItem>
+      isLoading={false}
+      crud={menuItemCRUD}
+      tableColumns={menuItemTableColumns}
+      gridColumns={menuItemGridColumns}
+      entityName="Menu Item"
+      searchPlaceholder="Search menu items..."
+      addButtonLabel="Add Menu Item"
+      emptyMessage="No menu items found"
+      renderCard={(menuItem, onClick) => (
+        <MenuItemCard
+          menuItem={menuItem}
+          onClick={onClick}
+          onEdit={() => {
+            const enhanced = { ...menuItem, hotel_id: hotelId };
+            menuItemCRUD.modalActions.openEditModal(enhanced);
+          }}
+          onDelete={() => {
+            const enhanced = { ...menuItem, hotel_id: hotelId };
+            menuItemCRUD.modalActions.openDeleteModal(enhanced);
+          }}
+          onRecommendedToggle={(id, newValue) =>
+            menuItemCRUD.handleRecommendedToggle(
+              id,
+              newValue,
+              "hotel_recommended"
+            )
+          }
+          currency={currency}
+        />
+      )}
+      renderDetailContent={(item) => <MenuItemDetail menuItem={item} />}
+      formFields={MENU_ITEM_FORM_FIELDS}
+      currency={currency}
+    />
   );
 };

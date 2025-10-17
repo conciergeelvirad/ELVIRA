@@ -1,15 +1,14 @@
 /**
- * Requests Tab Component
+ * Requests Tab Component (Refactored)
  *
  * Handles the display and management of amenity requests.
- * Includes search, filter, view modes, and CRUD operations.
+ * Now uses shared OrdersTabTemplate to eliminate duplication.
+ *
+ * @refactored Uses OrdersTabTemplate for consistent orders/requests management
  */
 
-import {
-  SearchAndFilterBar,
-  CRUDModalContainer,
-  LoadingState,
-} from "../../../../../components/common";
+import React from "react";
+import { OrdersTabTemplate } from "../../shared/orders/OrdersTabTemplate";
 import {
   AmenityRequestsDataView,
   AmenityRequestDetail,
@@ -17,8 +16,8 @@ import {
   AMENITY_REQUEST_EDIT_FORM_FIELDS,
   enhanceAmenityRequest,
 } from "../index";
+import type { AmenityRequest } from "../../../../../hooks/queries/hotel-management/amenity-requests";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface RequestsTabProps {
   isLoading: boolean;
   crud: ReturnType<
@@ -27,78 +26,46 @@ interface RequestsTabProps {
   tableColumns: any;
 }
 
-export const RequestsTab = ({
+/**
+ * Amenity Requests Tab - Simplified using OrdersTabTemplate
+ */
+export const RequestsTab: React.FC<RequestsTabProps> = ({
   isLoading,
   crud,
   tableColumns,
-}: RequestsTabProps) => {
-  const {
-    searchAndFilter,
-    modalState,
-    modalActions,
-    formState,
-    formActions,
-    handleCreateSubmit,
-    handleEditSubmit,
-    handleDeleteConfirm,
-  } = crud;
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    filterValue,
-    setFilterValue,
-    mode: viewMode,
-    setViewMode,
-    filteredData,
-  } = searchAndFilter;
-
+}) => {
   return (
-    <div className="space-y-4">
-      <SearchAndFilterBar
-        searchQuery={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search requests..."
-        filterActive={Boolean(filterValue)}
-        onFilterToggle={() => setFilterValue(filterValue ? "" : "pending")}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
-
-      {isLoading ? (
-        <LoadingState />
-      ) : (
+    <OrdersTabTemplate<AmenityRequest>
+      isLoading={isLoading}
+      crud={crud}
+      entityName="Amenity Request"
+      searchPlaceholder="Search requests..."
+      defaultFilterValue="pending"
+      emptyMessage="No amenity requests found"
+      formFields={AMENITY_REQUEST_FORM_FIELDS}
+      editFormFields={AMENITY_REQUEST_EDIT_FORM_FIELDS}
+      renderDataView={(viewMode, filteredData, handlers) => (
         <AmenityRequestsDataView
           viewMode={viewMode}
           filteredData={filteredData}
-          handleRowClick={(request) =>
-            modalActions.openDetailModal(enhanceAmenityRequest(request))
-          }
-          tableColumns={tableColumns}
-          onEdit={(request) => {
-            const requestData = enhanceAmenityRequest(request);
-            formActions.setFormData(requestData);
-            modalActions.openEditModal(requestData);
+          handleRowClick={(request: AmenityRequest) => {
+            const enhanced = enhanceAmenityRequest(request);
+            handlers.onView(enhanced);
           }}
-          onDelete={(request) =>
-            modalActions.openDeleteModal(enhanceAmenityRequest(request))
-          }
+          tableColumns={tableColumns}
+          onEdit={(request: AmenityRequest) => {
+            const enhanced = enhanceAmenityRequest(request);
+            crud.formActions.setFormData(enhanced);
+            handlers.onEdit(enhanced);
+          }}
+          onDelete={(request: AmenityRequest) => {
+            const enhanced = enhanceAmenityRequest(request);
+            handlers.onDelete(enhanced);
+          }}
         />
       )}
-
-      <CRUDModalContainer
-        modalState={modalState}
-        modalActions={modalActions}
-        formState={formState}
-        formActions={formActions}
-        formFields={AMENITY_REQUEST_FORM_FIELDS}
-        editFormFields={AMENITY_REQUEST_EDIT_FORM_FIELDS}
-        onCreateSubmit={handleCreateSubmit}
-        onEditSubmit={handleEditSubmit}
-        onDeleteConfirm={handleDeleteConfirm}
-        entityName="Amenity Request"
-        renderDetailContent={(item) => <AmenityRequestDetail item={item} />}
-      />
-    </div>
+      renderDetailContent={(item) => <AmenityRequestDetail item={item} />}
+      loadingMessage="Loading amenity requests..."
+    />
   );
 };

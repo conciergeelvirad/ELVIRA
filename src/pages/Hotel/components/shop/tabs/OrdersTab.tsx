@@ -1,9 +1,17 @@
+/**
+ * Orders Tab Component (Refactored)
+ *
+ * Displays and manages hotel shop orders with:
+ * - Search and filter functionality
+ * - Grid/List view modes
+ * - CRUD operations (edit, delete, view)
+ * - Real-time updates
+ *
+ * @refactored Uses OrdersTabTemplate for consistent orders management
+ */
+
 import React from "react";
-import {
-  SearchAndFilterBar,
-  CRUDModalContainer,
-  LoadingState,
-} from "../../../../../components/common";
+import { OrdersTabTemplate } from "../../shared/orders/OrdersTabTemplate";
 import {
   ShopOrdersDataView,
   ShopOrderDetail,
@@ -12,6 +20,7 @@ import {
   SHOP_ORDER_EDIT_FORM_FIELDS,
 } from "../index";
 import type { useShopOrderCRUD } from "../../../hooks/shop/useShopOrderCRUD";
+import type { ShopOrder } from "../../../../../hooks/queries/hotel-management/shop-orders";
 
 interface OrdersTabProps {
   isLoading: boolean;
@@ -22,13 +31,7 @@ interface OrdersTabProps {
 }
 
 /**
- * Orders Tab Component
- *
- * Displays and manages hotel shop orders with:
- * - Search and filter functionality
- * - Grid/List view modes
- * - CRUD operations (create, edit, delete, view)
- * - Real-time updates
+ * Shop Orders Tab - Simplified using OrdersTabTemplate
  */
 export const OrdersTab: React.FC<OrdersTabProps> = ({
   isLoading,
@@ -37,93 +40,64 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
   gridColumns,
   safeHotelId,
 }) => {
-  const {
-    searchAndFilter,
-    modalState,
-    modalActions,
-    formState,
-    formActions,
-    handleCreateSubmit,
-    handleEditSubmit,
-    handleDeleteConfirm,
-  } = crud;
-
-  const {
-    searchTerm,
-    setSearchTerm,
-    filterValue,
-    setFilterValue,
-    mode: viewMode,
-    setViewMode,
-    filteredData,
-  } = searchAndFilter;
-
-  if (isLoading) {
-    return <LoadingState message="Loading orders..." />;
-  }
-
   return (
-    <div className="space-y-4">
-      <SearchAndFilterBar
-        searchQuery={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search shop orders..."
-        filterActive={Boolean(filterValue)}
-        onFilterToggle={() => setFilterValue(filterValue ? "" : "active")}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
-
-      <ShopOrdersDataView
-        viewMode={viewMode}
-        filteredData={filteredData}
-        handleRowClick={(order) =>
-          modalActions.openDetailModal(
-            enhanceShopOrder({ ...order, hotel_id: safeHotelId })
-          )
-        }
-        tableColumns={tableColumns}
-        gridColumns={gridColumns}
-        onView={(order) =>
-          modalActions.openDetailModal(
-            enhanceShopOrder({ ...order, hotel_id: safeHotelId })
-          )
-        }
-        onEdit={(order) => {
-          const formData = {
-            guest_id: order.guest_id,
-            delivery_date: order.delivery_date,
-            delivery_time: order.delivery_time,
-            total_price: order.total_price,
-            status: order.status,
-            special_instructions: order.special_instructions,
-            hotel_id: safeHotelId,
-          };
-          formActions.setFormData(formData);
-          modalActions.openEditModal(
-            enhanceShopOrder({ ...order, hotel_id: safeHotelId })
-          );
-        }}
-        onDelete={(order) =>
-          modalActions.openDeleteModal(
-            enhanceShopOrder({ ...order, hotel_id: safeHotelId })
-          )
-        }
-      />
-
-      <CRUDModalContainer
-        modalState={modalState}
-        modalActions={modalActions}
-        formState={formState}
-        formActions={formActions}
-        formFields={SHOP_ORDER_FORM_FIELDS}
-        editFormFields={SHOP_ORDER_EDIT_FORM_FIELDS}
-        entityName="Shop Order"
-        onCreateSubmit={handleCreateSubmit}
-        onEditSubmit={handleEditSubmit}
-        onDeleteConfirm={handleDeleteConfirm}
-        renderDetailContent={(item) => <ShopOrderDetail item={item} />}
-      />
-    </div>
+    <OrdersTabTemplate<ShopOrder>
+      isLoading={isLoading}
+      crud={crud}
+      entityName="Shop Order"
+      searchPlaceholder="Search shop orders..."
+      defaultFilterValue="active"
+      emptyMessage="No shop orders found"
+      formFields={SHOP_ORDER_FORM_FIELDS}
+      editFormFields={SHOP_ORDER_EDIT_FORM_FIELDS}
+      renderDataView={(viewMode, filteredData, handlers) => (
+        <ShopOrdersDataView
+          viewMode={viewMode}
+          filteredData={filteredData}
+          handleRowClick={(order: ShopOrder) => {
+            const enhanced = enhanceShopOrder({
+              ...order,
+              hotel_id: safeHotelId,
+            });
+            handlers.onView(enhanced);
+          }}
+          tableColumns={tableColumns}
+          gridColumns={gridColumns}
+          onView={(order: ShopOrder) => {
+            const enhanced = enhanceShopOrder({
+              ...order,
+              hotel_id: safeHotelId,
+            });
+            handlers.onView(enhanced);
+          }}
+          onEdit={(order: ShopOrder) => {
+            const formData = {
+              guest_id: order.guest_id,
+              delivery_date: order.delivery_date,
+              delivery_time: order.delivery_time,
+              total_price: order.total_price,
+              status: order.status,
+              special_instructions: order.special_instructions,
+              hotel_id: safeHotelId,
+            };
+            crud.formActions.setFormData(formData);
+            const enhanced = enhanceShopOrder({
+              ...order,
+              hotel_id: safeHotelId,
+            });
+            handlers.onEdit(enhanced);
+          }}
+          onDelete={(order: ShopOrder) => {
+            const enhanced = enhanceShopOrder({
+              ...order,
+              hotel_id: safeHotelId,
+            });
+            handlers.onDelete(enhanced);
+          }}
+        />
+      )}
+      renderDetailContent={(item) => <ShopOrderDetail item={item} />}
+      loadingMessage="Loading shop orders..."
+    />
   );
 };
