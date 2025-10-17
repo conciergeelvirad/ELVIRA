@@ -1,0 +1,13 @@
+export { HotelDashboard } from "./Hotel/HotelDashboard";
+export { HotelStaffPage } from "./Hotel/HotelStaffPage";
+export { AmenitiesPage } from "./Hotel/AmenitiesPage";
+export { HotelRestaurantPage } from "./Hotel/HotelRestaurantPage";
+export { HotelShopPage } from "./Hotel/HotelShopPage";
+export { EmergencyContactsPage } from "./Hotel/EmergencyContactsPage";
+export { QARecommendationsPage } from "./Hotel/QARecommendationsPage";
+export { ThirdPartyManagementPage } from "./Hotel/ThirdPartyManagementPage";
+export { ChatManagementPage } from "./Hotel/ChatManagementPage";
+export { GuestManagementPage } from "./Hotel/GuestManagementPage";
+export { AnnouncementsPage } from "./Hotel/AnnouncementsPage";
+export { SettingsPage } from "./Hotel/SettingsPage";
+export { AISupportPage } from "./Hotel/AISupportPage";

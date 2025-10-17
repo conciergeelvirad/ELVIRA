@@ -1,0 +1,121 @@
+For all designs I ask you to make, have them be beautiful, not cookie-cutter. Make webpages that are fully featured, production-ready, and visually appealing.
+
+By default, this template supports JSX syntax, Tailwind CSS classes, React hooks, and Lucide React for icons.
+Do not install other UI libraries or icon packages unless absolutely necessary or I request them.
+Use icons from Lucide React for logos and interface elements.
+
+Architecture & Structure Rules
+
+Follow a modular, scalable architecture with a clear separation of concerns:
+
+/components → UI elements
+
+/hooks → reusable logic
+
+/context → global state
+
+/services → Supabase/API logic
+
+/lib → client instances (e.g., Supabase client)
+
+/config → app and environment configurations
+
+/types → TypeScript interfaces and DB schemas
+
+/utils → helper and formatting functions
+
+Never mix UI and business logic in the same file.
+
+Use absolute imports (@/components/...) instead of relative paths.
+
+Maintain consistent naming conventions:
+
+PascalCase → components
+
+camelCase → variables and functions
+
+Keep each file under 200 lines; split larger files into smaller logical units.
+
+Database & Realtime Logic
+
+Use Supabase (Bolt Database) as the single source of truth.
+
+Fetch data, listen for real-time database changes, and support optimistic UI updates.
+
+Use one client instance: /lib/supabaseClient.ts.
+
+Manage real-time subscriptions globally via /context/RealtimeContext.tsx.
+
+Cache and share data across pages through /context/DataStoreContext.tsx or Zustand/React Query.
+
+Do not create multiple database connections or duplicate subscriptions per component.
+
+Code Quality & Documentation
+
+Write clean, readable, and production-ready code with comments explaining data flow.
+
+Use TypeScript strictly — no any types.
+
+Add JSDoc comments to exported functions, hooks, and services.
+
+Each file must have a single clear purpose; remove unused imports and dead code.
+
+Keep utilities (/utils) pure and independent from UI or Supabase logic.
+
+Comment all complex logic (realtime events, optimistic updates, caching mechanisms).
+
+UI / UX Standards
+
+All UI should be beautiful, consistent, and responsive — never generic.
+
+Use Tailwind CSS exclusively for styling and spacing.
+
+Use Lucide React for all icons.
+
+Follow consistent color palettes, typography, and spacing.
+
+Include support for dark and light themes when possible.
+
+Maintain accessibility standards (ARIA attributes, keyboard navigation).
+
+No inline styles or third-party UI kits unless explicitly approved.
+
+AI Behavior Rules
+
+Always respect the defined folder structure and naming conventions.
+
+Never create new folders or files outside the defined structure.
+
+Keep code consistent, scalable, and refactor-friendly.
+
+Add comments to explain key logic and architectural decisions.
+
+Use small, modular files over large monolithic ones.
+
+If unsure, prefer a placeholder with a TODO comment rather than an assumption.
+
+Design System Consistency
+
+All core UI elements (buttons, modals, inputs, cards) should come from /components/common/.
+
+Follow a consistent API for shared components (variant, size, state, etc.).
+
+Use semantic HTML and ensure all components meet accessibility best practices.
+
+Components must integrate seamlessly with Tailwind’s utility classes.
+
+Output & Review Rules
+
+Always show the folder path and file name before each code block.
+
+Include short inline comments explaining what each section of code does.
+
+Ensure all code is copy-paste ready and self-contained (no broken imports).
+
+Keep generated code aligned with the defined architecture and best practices.
+
+Development & Architecture Standards
+
+Follow a clean, layered architecture with real-time data synchronization (Supabase), optimistic updates, and a clear separation between UI, logic, and data layers.
+Maintain small, well-structured files under 200 lines, with strong TypeScript typing, modular hooks, and reusable UI components.
+All code must be documented, readable, and easy to maintain — ready for production deployment.

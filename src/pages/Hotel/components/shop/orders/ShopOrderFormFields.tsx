@@ -1,0 +1,55 @@
+/**
+ * Shop Order Form Fields Configuration
+ */
+
+import { FormFieldConfig } from "../../../../../hooks";
+
+export const SHOP_ORDER_FORM_FIELDS: FormFieldConfig[] = [
+  {
+    key: "guest_id",
+    label: "Guest ID",
+    type: "text" as const,
+    required: true,
+    placeholder: "Enter guest ID",
+  },
+  {
+    key: "delivery_date",
+    label: "Delivery Date",
+    type: "date" as const,
+    required: true,
+  },
+  {
+    key: "delivery_time",
+    label: "Delivery Time",
+    type: "text" as const,
+    required: false,
+    placeholder: "e.g., 14:00",
+  },
+  {
+    key: "total_price",
+    label: "Total Price",
+    type: "number" as const,
+    required: true,
+    placeholder: "0.00",
+  },
+  {
+    key: "status",
+    label: "Status",
+    type: "select" as const,
+    required: true,
+    options: [
+      { value: "PENDING", label: "Pending" },
+      { value: "PROCESSING", label: "Processing" },
+      { value: "COMPLETED", label: "Completed" },
+      { value: "DELIVERED", label: "Delivered" },
+      { value: "CANCELLED", label: "Cancelled" },
+    ],
+  },
+  {
+    key: "special_instructions",
+    label: "Special Instructions",
+    type: "textarea" as const,
+    required: false,
+    placeholder: "Any special instructions for this order",
+  },
+];

@@ -1,0 +1,55 @@
+/**
+ * Languages Constants
+ *
+ * Complete list of languages for form dropdowns
+ */
+
+export const LANGUAGES = [
+  "Arabic",
+  "Bengali",
+  "Bulgarian",
+  "Catalan",
+  "Chinese (Simplified)",
+  "Chinese (Traditional)",
+  "Croatian",
+  "Czech",
+  "Danish",
+  "Dutch",
+  "English",
+  "Estonian",
+  "Filipino",
+  "Finnish",
+  "French",
+  "German",
+  "Greek",
+  "Hebrew",
+  "Hindi",
+  "Hungarian",
+  "Icelandic",
+  "Indonesian",
+  "Italian",
+  "Japanese",
+  "Korean",
+  "Latvian",
+  "Lithuanian",
+  "Malay",
+  "Norwegian",
+  "Persian",
+  "Polish",
+  "Portuguese",
+  "Romanian",
+  "Russian",
+  "Serbian",
+  "Slovak",
+  "Slovenian",
+  "Spanish",
+  "Swahili",
+  "Swedish",
+  "Thai",
+  "Turkish",
+  "Ukrainian",
+  "Urdu",
+  "Vietnamese",
+] as const;
+
+export type Language = (typeof LANGUAGES)[number];

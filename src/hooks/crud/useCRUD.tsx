@@ -1,0 +1,154 @@
+import { useState, useEffect } from "react";
+import { useCRUDOperations } from "./useCRUDOperations";
+import { useCRUDModals } from "./useCRUDModals";
+import { useCRUDForm } from "./useCRUDForm";
+import { useSearchAndFilter } from "../search";
+import { FormFieldConfig } from "./useCRUDForm";
+import { CRUDModalState, CRUDModalActions } from "./useCRUDModals";
+
+// Define generic types for our CRUD hook
+export type CRUDEntity = Record<string, unknown> & { id: string | number };
+export type EnhancedEntity<T extends CRUDEntity> = T & Record<string, unknown>;
+
+export interface UseCRUDOptions<T extends CRUDEntity> {
+  initialData: T[];
+  formFields: FormFieldConfig[];
+  searchFields: string[];
+  defaultViewMode?: "grid" | "list";
+  enhanceEntity?: (entity: T) => EnhancedEntity<T>;
+  formatNewEntity?: (formData: Record<string, unknown>) => Partial<T>;
+  formatUpdatedEntity?: (formData: Record<string, unknown>) => Partial<T>;
+  customOperations?: {
+    create?: (data: Partial<T>) => Promise<void>;
+    update?: (id: string | number, data: Partial<T>) => Promise<void>;
+    delete?: (id: string | number) => Promise<void>;
+  };
+}
+
+// Re-export types from useCRUDForm.ts to avoid importing them directly in this file
+import type { CRUDFormState, CRUDFormActions } from "./useCRUDForm";
+
+export interface UseCRUDResult<T extends CRUDEntity> {
+  data: T[];
+  searchAndFilter: {
+    searchTerm: string;
+    setSearchTerm: (term: string) => void;
+    filterValue: string;
+    setFilterValue: (value: string) => void;
+    mode: "grid" | "list";
+    setViewMode: (mode: "grid" | "list") => void;
+    filteredData: Record<string, unknown>[];
+  };
+  modalState: CRUDModalState<EnhancedEntity<T>>;
+  modalActions: CRUDModalActions<EnhancedEntity<T>>;
+  formState: CRUDFormState;
+  formActions: CRUDFormActions;
+  handleStatusToggle: (entityId: string | number, newStatus: boolean) => void;
+  handleCreateSubmit: () => Promise<void>;
+  handleEditSubmit: () => Promise<void>;
+  handleDeleteConfirm: () => Promise<void>;
+  enhanceEntity: (entity: T) => EnhancedEntity<T>;
+}
+
+/**
+ * Generic CRUD hook that can be used with any entity type
+ * @param options Configuration options for the CRUD hook
+ * @returns All the state and actions needed for a CRUD interface
+ */
+export const useCRUD = <T extends CRUDEntity>({
+  initialData,
+  formFields,
+  searchFields,
+  defaultViewMode = "list",
+  enhanceEntity = (entity: T) => entity as unknown as EnhancedEntity<T>,
+  formatNewEntity = (formData: Record<string, unknown>) =>
+    formData as Partial<T>,
+  formatUpdatedEntity = (formData: Record<string, unknown>) =>
+    formData as Partial<T>,
+  customOperations,
+}: UseCRUDOptions<T>): UseCRUDResult<T> => {
+  // Main state for entities
+  const [data, setData] = useState<T[]>(initialData);
+
+  // Sync data when initialData changes (e.g., when API data loads)
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  // Cast data for useSearchAndFilter compatibility
+  const dataAsRecords = data as unknown as Record<string, unknown>[];
+
+  // Use search and filter hook for data management
+  const searchAndFilter = useSearchAndFilter({
+    data: dataAsRecords,
+    searchFields,
+    defaultViewMode,
+  });
+
+  // Use CRUD operations hook with custom operations
+  const crudOperations = useCRUDOperations<T>(data, setData, customOperations);
+
+  // Extract the form field keys for the modal
+  const formKeys = formFields.map((field) => field.key);
+
+  // Use CRUD form hook for form management (create this first)
+  const [formState, formActions] = useCRUDForm(formFields);
+
+  // Use CRUD modal hook for modal management with type casting for compatibility
+  // Pass the form's setFormData so modals can update the form state
+  const [modalState, modalActions] = useCRUDModals<EnhancedEntity<T>>(
+    formKeys,
+    formActions.setFormData
+  );
+
+  // Handle status toggle (common functionality)
+  const handleStatusToggle = (
+    entityId: string | number,
+    newStatus: boolean
+  ) => {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.id === entityId
+          ? ({
+              ...item,
+              status: newStatus ? "ACTIVE" : "INACTIVE",
+            } as unknown as T)
+          : item
+      )
+    );
+  };
+
+  // Handle create submission
+  const handleCreateSubmit = async () => {
+    const newEntityData = formatNewEntity(formState.formData);
+    await crudOperations.create(newEntityData as T);
+  };
+
+  // Handle edit submission
+  const handleEditSubmit = async () => {
+    if (!modalState.itemToEdit) return;
+
+    const updatedData = formatUpdatedEntity(formState.formData);
+    await crudOperations.update(modalState.itemToEdit.id, updatedData);
+  };
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = async () => {
+    if (!modalState.itemToDelete) return;
+    await crudOperations.delete(modalState.itemToDelete.id);
+  };
+
+  return {
+    data,
+    searchAndFilter,
+    modalState,
+    modalActions,
+    formState,
+    formActions,
+    handleStatusToggle,
+    handleCreateSubmit,
+    handleEditSubmit,
+    handleDeleteConfirm,
+    enhanceEntity,
+  };
+};
