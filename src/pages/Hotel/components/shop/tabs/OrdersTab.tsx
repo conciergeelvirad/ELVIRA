@@ -1,8 +1,6 @@
 import React from "react";
-import { Plus } from "lucide-react";
 import {
   SearchAndFilterBar,
-  Button,
   CRUDModalContainer,
   LoadingState,
 } from "../../../../../components/common";
@@ -11,6 +9,7 @@ import {
   ShopOrderDetail,
   enhanceShopOrder,
   SHOP_ORDER_FORM_FIELDS,
+  SHOP_ORDER_EDIT_FORM_FIELDS,
 } from "../index";
 import type { useShopOrderCRUD } from "../../../hooks/shop/useShopOrderCRUD";
 
@@ -73,15 +72,6 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
         onFilterToggle={() => setFilterValue(filterValue ? "" : "active")}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        rightActions={
-          <Button
-            variant="dark"
-            leftIcon={Plus}
-            onClick={modalActions.openCreateModal}
-          >
-            ADD ORDER
-          </Button>
-        }
       />
 
       <ShopOrdersDataView
@@ -127,6 +117,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
         formState={formState}
         formActions={formActions}
         formFields={SHOP_ORDER_FORM_FIELDS}
+        editFormFields={SHOP_ORDER_EDIT_FORM_FIELDS}
         entityName="Shop Order"
         onCreateSubmit={handleCreateSubmit}
         onEditSubmit={handleEditSubmit}

@@ -1,6 +1,10 @@
-import { Calendar, Clock } from "lucide-react";
+import { Package } from "lucide-react";
 import { Column, GridColumn } from "../../../../../types/table";
-import { AmenityRequest } from "../../../../../hooks/queries/hotel-management/amenity-requests";
+import {
+  AmenityRequest,
+  ExtendedAmenityRequest,
+} from "../../../../../hooks/queries/hotel-management/amenity-requests";
+import { ItemWithImage, StatusBadge } from "../../../../../components/common";
 
 type EnhancedAmenityRequest = AmenityRequest & Record<string, unknown>;
 
@@ -11,78 +15,110 @@ export const enhanceAmenityRequest = (
   return request as unknown as EnhancedAmenityRequest;
 };
 
-// Helper to get status badge color
-const getStatusColor = (status: string) => {
+// Helper to map request status to StatusBadge status type
+const mapRequestStatus = (
+  status: string
+): "completed" | "pending" | "cancelled" | "default" => {
   switch (status.toLowerCase()) {
-    case "pending":
-      return "bg-yellow-100 text-yellow-700";
-    case "approved":
-      return "bg-green-100 text-green-700";
     case "completed":
-      return "bg-blue-100 text-blue-700";
+    case "approved":
+      return "completed";
+    case "pending":
+      return "pending";
     case "rejected":
-      return "bg-red-100 text-red-700";
+    case "cancelled":
+      return "cancelled";
     default:
-      return "bg-gray-100 text-gray-700";
+      return "default";
   }
 };
 
-export const getTableColumns = (): Column<AmenityRequest>[] => {
+export const getTableColumns = (
+  onStatusClick?: (request: ExtendedAmenityRequest) => void
+): Column<ExtendedAmenityRequest>[] => {
   return [
     {
-      key: "request_date",
-      header: "DATE",
+      key: "id",
+      header: "REQUEST ID",
       sortable: true,
-      render: (value) => {
-        const date = value ? new Date(value as string) : null;
+      render: (value) => (
+        <div className="flex items-center gap-2">
+          <Package className="w-4 h-4 text-blue-600" />
+          <span className="font-medium text-gray-900">
+            #{String(value).slice(0, 8)}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: "amenities",
+      header: "AMENITY",
+      sortable: true,
+      render: (_value, request) => {
+        const amenity = request.amenities as any;
         return (
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-blue-600" />
-            <span className="font-medium text-gray-900">
-              {date
-                ? date.toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })
-                : "N/A"}
-            </span>
-          </div>
+          <ItemWithImage
+            imageUrl={amenity?.image_url || ""}
+            title={amenity?.name || "Unknown Amenity"}
+            description=""
+            fallbackIcon={<Package className="w-5 h-5" />}
+          />
         );
       },
     },
     {
-      key: "request_time",
-      header: "TIME",
+      key: "guests",
+      header: "GUEST",
       sortable: true,
-      render: (value) => (
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-purple-600" />
-          <span className="text-sm text-gray-600">{value || "N/A"}</span>
-        </div>
-      ),
+      render: (_value, request) => {
+        const guest = request.guests as any;
+        const personalData = guest?.guest_personal_data;
+        const fullName = personalData
+          ? `${personalData.first_name} ${personalData.last_name}`
+          : "Unknown Guest";
+        return <span className="text-sm text-gray-900">{fullName}</span>;
+      },
+    },
+    {
+      key: "room_number",
+      header: "ROOM",
+      sortable: true,
+      render: (_value, request) => {
+        const guest = request.guests as any;
+        return (
+          <span className="text-sm text-gray-600">
+            {guest?.room_number || "N/A"}
+          </span>
+        );
+      },
     },
     {
       key: "status",
       header: "STATUS",
       sortable: true,
-      render: (value) => (
-        <span
-          className={`text-xs font-medium px-2 py-1 rounded ${getStatusColor(
-            value as string
-          )}`}
-        >
-          {(value as string).toUpperCase()}
-        </span>
+      render: (value, request) => (
+        <StatusBadge
+          status={mapRequestStatus(String(value))}
+          label={String(value).toUpperCase()}
+          variant="soft"
+          onClick={onStatusClick ? () => onStatusClick(request) : undefined}
+          clickable={!!onStatusClick}
+        />
       ),
     },
     {
-      key: "special_instructions",
-      header: "INSTRUCTIONS",
-      sortable: false,
+      key: "created_at",
+      header: "CREATED",
+      sortable: true,
       render: (value) => (
-        <span className="text-sm text-gray-600 truncate max-w-xs">
-          {value || "-"}
+        <span className="text-sm text-gray-600">
+          {value
+            ? new Date(value as string).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "N/A"}
         </span>
       ),
     },
@@ -92,28 +128,39 @@ export const getTableColumns = (): Column<AmenityRequest>[] => {
 export const getGridColumns = (): GridColumn[] => {
   return [
     {
-      key: "request_date",
-      label: "Date",
-      accessor: "request_date",
-      render: (value: string) => {
-        const date = new Date(value);
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
-      },
+      key: "id",
+      label: "Request ID",
+      accessor: "id",
+      render: (value: string) => `#${value.slice(0, 8)}`,
     },
     {
-      key: "request_time",
-      label: "Time",
-      accessor: "request_time",
+      key: "amenities",
+      label: "Amenity",
+      accessor: "amenities",
+      render: (value: any) => value?.name || "Unknown",
+    },
+    {
+      key: "guests",
+      label: "Guest",
+      accessor: "guests",
+      render: (value: any) => {
+        const personalData = value?.guest_personal_data;
+        return personalData
+          ? `${personalData.first_name} ${personalData.last_name}`
+          : "Unknown";
+      },
     },
     {
       key: "status",
       label: "Status",
       accessor: "status",
-      render: (value: string) => value.toUpperCase(),
+      render: (value: string) => (
+        <StatusBadge
+          status={mapRequestStatus(value)}
+          label={value.toUpperCase()}
+          variant="soft"
+        />
+      ),
     },
   ];
 };
@@ -136,8 +183,6 @@ export const getDetailFields = (request: AmenityRequest) => [
     label: "Special Instructions",
     value: request.special_instructions || "None",
   },
-  { label: "Amenity ID", value: request.amenity_id },
-  { label: "Guest ID", value: request.guest_id },
   {
     label: "Created",
     value: request.created_at

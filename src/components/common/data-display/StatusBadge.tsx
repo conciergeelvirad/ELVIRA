@@ -23,6 +23,8 @@ interface StatusBadgeProps {
   size?: StatusSize;
   className?: string;
   variant?: "filled" | "outlined" | "soft";
+  onClick?: () => void;
+  clickable?: boolean;
 }
 
 const statusConfig = {
@@ -124,18 +126,24 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   size = "md",
   className,
   variant = "soft",
+  onClick,
+  clickable = false,
 }) => {
   const statusStyles =
     statusConfig[status]?.[variant] || statusConfig.default[variant];
   const sizeStyles = sizeConfig[size];
   const displayLabel = label || getStatusLabel(status);
 
+  const isClickable = clickable || !!onClick;
+
   return (
     <span
+      onClick={isClickable ? onClick : undefined}
       className={cn(
         "inline-flex items-center rounded-full font-medium border transition-colors",
         statusStyles,
         sizeStyles,
+        isClickable && "cursor-pointer hover:opacity-80 active:scale-95",
         className
       )}
     >

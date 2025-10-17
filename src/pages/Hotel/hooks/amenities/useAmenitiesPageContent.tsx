@@ -62,8 +62,14 @@ export const useAmenitiesPageContent = ({
 
   // Get columns based on current state for amenity requests
   const requestTableColumns = React.useMemo(
-    () => getAmenityRequestTableColumns(),
-    []
+    () =>
+      getAmenityRequestTableColumns((request) => {
+        // When status badge is clicked, open edit modal with only status editable
+        const requestData = request;
+        amenityRequestCRUD.formActions.setFormData(requestData);
+        amenityRequestCRUD.modalActions.openEditModal(requestData);
+      }),
+    [amenityRequestCRUD]
   );
 
   // Generate tab content with proper memoization

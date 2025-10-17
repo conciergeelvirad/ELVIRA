@@ -30,6 +30,13 @@ export const DINE_IN_ORDER_SELECT_QUERY = `
     *,
     menu_item:menu_items(*)
   ),
-  guest:guests(*),
+  guest:guests(
+    id,
+    room_number,
+    guest_personal_data(
+      first_name,
+      last_name
+    )
+  ),
   restaurant:restaurants(*)
 `;

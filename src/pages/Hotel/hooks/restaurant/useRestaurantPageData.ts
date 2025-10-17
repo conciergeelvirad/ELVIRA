@@ -42,8 +42,11 @@ export const useRestaurantPageData = () => {
   const { data: rawMenuItems = [], isLoading: menuItemsLoading } =
     useRestaurantMenuItems(safeHotelId, defaultRestaurantId);
 
-  const { data: dineInOrders = [], isLoading: ordersLoading } =
+  const { data: rawDineInOrders = [], isLoading: ordersLoading } =
     useRestaurantDineInOrders(safeHotelId);
+
+  // Memoize dine-in orders to prevent unnecessary re-renders and infinite loops
+  const dineInOrders = React.useMemo(() => rawDineInOrders, [rawDineInOrders]);
 
   // Filter menu items to exclude those that belong ONLY to inactive restaurants
   const menuItems = React.useMemo(() => {

@@ -18,7 +18,10 @@ export {
   enhanceAmenityRequest,
   getDetailFields as getAmenityRequestDetailFields,
 } from "./requests/AmenityRequestColumns";
-export { AMENITY_REQUEST_FORM_FIELDS } from "./requests/AmenityRequestFormFields";
+export {
+  AMENITY_REQUEST_FORM_FIELDS,
+  AMENITY_REQUEST_EDIT_FORM_FIELDS,
+} from "./requests/AmenityRequestFormFields";
 
 // Tab Components Exports
 export { AmenitiesTab, RequestsTab } from "./tabs";

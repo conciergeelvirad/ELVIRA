@@ -40,6 +40,8 @@ export interface MenuItem {
 // Order item with menu item details
 export interface DineInOrderItemWithMenuItem extends DineInOrderItem {
   menu_item: MenuItem;
+  quantity: number; // Explicitly define quantity from database
+  price_at_order: number; // Explicitly define price from database
 }
 
 // Complete dine-in order with relationships

@@ -21,8 +21,14 @@ export {
 } from "./menu-items/MenuItemColumns";
 
 // Dine-In Order components
-export { DineInOrdersDataView } from "./dine-in-orders/DineInOrderComponents";
-export { DINE_IN_ORDER_FORM_FIELDS } from "./dine-in-orders/DineInOrderComponents";
+export {
+  DineInOrdersDataView,
+  DineInOrderDetail,
+} from "./dine-in-orders/DineInOrderComponents";
+export {
+  DINE_IN_ORDER_FORM_FIELDS,
+  DINE_IN_ORDER_EDIT_FORM_FIELDS,
+} from "./dine-in-orders/DineInOrderComponents";
 
 // Tab components
 export { RestaurantsTab } from "./tabs/RestaurantsTab";

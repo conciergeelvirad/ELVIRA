@@ -20,6 +20,7 @@ interface CRUDModalContainerProps<T> {
 
   // Configuration
   formFields: FormFieldConfig[];
+  editFormFields?: FormFieldConfig[]; // Optional: Different fields for edit mode
   entityName: string; // e.g., "Contact", "Product", "User"
 
   // CRUD handlers
@@ -59,12 +60,13 @@ interface CRUDModalContainerProps<T> {
   enableMultiGuest?: boolean;
 }
 
-export const CRUDModalContainer = <T extends { id: string | number }>({
+export const CRUDModalContainer = <T,>({
   modalState,
   modalActions,
   formState,
   formActions,
   formFields,
+  editFormFields,
   entityName,
   onCreateSubmit,
   onEditSubmit,
@@ -73,9 +75,9 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
   editModalTitle,
   deleteModalTitle,
   detailModalTitle,
-  createButtonText = "Create",
-  editButtonText = "Save Changes",
-  deleteButtonText = "Delete",
+  createButtonText,
+  editButtonText,
+  deleteButtonText,
   renderDetailContent,
   detailModalActions = { showEdit: true, showDelete: true },
   customFormComponent: CustomFormComponent,
@@ -167,7 +169,7 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
         isLoading={formState.isSubmitting}
       >
         <FormComponent
-          fields={formFields}
+          fields={editFormFields || formFields}
           formState={formState}
           formActions={formActions}
           enableMultiGuest={false}

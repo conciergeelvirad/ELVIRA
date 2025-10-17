@@ -4,6 +4,7 @@
 
 import { FormFieldConfig } from "../../../../../hooks";
 
+// Form fields for creating new amenity requests
 export const AMENITY_REQUEST_FORM_FIELDS: FormFieldConfig[] = [
   {
     key: "amenity_id",
@@ -50,5 +51,22 @@ export const AMENITY_REQUEST_FORM_FIELDS: FormFieldConfig[] = [
     type: "textarea" as const,
     required: false,
     placeholder: "Enter any special instructions...",
+  },
+];
+
+// Form fields for editing amenity requests (only status can be updated)
+export const AMENITY_REQUEST_EDIT_FORM_FIELDS: FormFieldConfig[] = [
+  {
+    key: "status",
+    label: "Status",
+    type: "select" as const,
+    required: true,
+    options: [
+      { value: "pending", label: "Pending" },
+      { value: "approved", label: "Approved" },
+      { value: "completed", label: "Completed" },
+      { value: "rejected", label: "Rejected" },
+      { value: "cancelled", label: "Cancelled" },
+    ],
   },
 ];

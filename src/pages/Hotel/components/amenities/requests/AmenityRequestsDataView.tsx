@@ -21,17 +21,25 @@ interface AmenityRequestsDataViewProps {
  * Grid columns for amenity requests
  */
 const requestGridColumns: GridColumn[] = [
-  { key: "guest_id", label: "Guest" },
-  { key: "amenity_id", label: "Amenity" },
-  { key: "request_date", label: "Date" },
+  { key: "id", label: "Request ID" },
+  { key: "amenity", label: "Amenity" },
+  { key: "guest", label: "Guest" },
+  { key: "room_number", label: "Room" },
   { key: "status", label: "Status" },
+  { key: "created_at", label: "Created" },
 ];
 
 /**
  * Amenity Request Card Component for Grid View
  */
 const AmenityRequestCard: React.FC<{
-  request: AmenityRequest;
+  request: AmenityRequest & {
+    amenities?: { name: string; image_url?: string };
+    guests?: {
+      room_number?: string;
+      guest_personal_data?: { first_name: string; last_name: string };
+    };
+  };
   onClick: () => void;
   onEdit?: (request: AmenityRequest) => void;
   onDelete?: (request: AmenityRequest) => void;
@@ -41,10 +49,30 @@ const AmenityRequestCard: React.FC<{
     approved: "Approved",
     completed: "Completed",
     rejected: "Rejected",
+    cancelled: "Cancelled",
   };
 
   const status = statusLabels[request.status] || request.status;
-  const requestDate = new Date(request.request_date).toLocaleDateString();
+
+  // Extract amenity name
+  const amenityName = (request.amenities as any)?.name || "Unknown Amenity";
+
+  // Extract guest data
+  const guest = request.guests as any;
+  const personalData = guest?.guest_personal_data;
+  const guestName = personalData
+    ? `${personalData.first_name} ${personalData.last_name}`
+    : "Unknown Guest";
+  const roomNumber = guest?.room_number || "N/A";
+
+  // Format created date
+  const createdDate = request.created_at
+    ? new Date(request.created_at).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "N/A";
 
   const sections: Array<{
     icon?: React.ReactNode;
@@ -52,40 +80,69 @@ const AmenityRequestCard: React.FC<{
     className?: string;
   }> = [
     {
+      icon: <FileText className="w-4 h-4" />,
+      content: (
+        <>
+          <span className="font-medium">Amenity:</span> {amenityName}
+        </>
+      ),
+    },
+    {
       icon: <User className="w-4 h-4" />,
       content: (
-        <span className="text-sm">
-          Guest ID: {request.guest_id.slice(0, 8)}...
-        </span>
+        <>
+          <span className="font-medium">Guest:</span> {guestName}
+        </>
       ),
     },
     {
       icon: <Calendar className="w-4 h-4" />,
-      content: <span className="text-sm">Date: {requestDate}</span>,
+      content: (
+        <>
+          <span className="font-medium">Created:</span> {createdDate}
+        </>
+      ),
     },
   ];
+
+  if (request.request_date) {
+    const requestDate = new Date(request.request_date).toLocaleDateString(
+      "en-US",
+      {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }
+    );
+    sections.push({
+      icon: <Calendar className="w-4 h-4" />,
+      content: (
+        <>
+          <span className="font-medium">Request Date:</span> {requestDate}
+        </>
+      ),
+    });
+  }
 
   if (request.request_time) {
     sections.push({
       icon: <Clock className="w-4 h-4" />,
-      content: <span className="text-sm">Time: {request.request_time}</span>,
-    });
-  }
-
-  if (request.special_instructions) {
-    sections.push({
-      icon: <FileText className="w-4 h-4 mt-0.5" />,
       content: (
-        <p className="text-sm line-clamp-2">{request.special_instructions}</p>
+        <>
+          <span className="font-medium">Time:</span> {request.request_time}
+        </>
       ),
-      className: "items-start",
     });
   }
 
   return (
     <GenericCard
-      icon={<Calendar className="w-6 h-6 text-orange-600" />}
-      iconBgColor="bg-orange-100"
+      icon={
+        <div className="flex items-center justify-center w-full h-full">
+          <span className="text-lg font-bold text-blue-600">{roomNumber}</span>
+        </div>
+      }
+      iconBgColor="bg-blue-100"
       title={`Amenity Request`}
       subtitle={`ID: ${request.id.slice(0, 8)}`}
       badge={{

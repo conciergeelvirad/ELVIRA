@@ -4,6 +4,7 @@
 
 import { FormFieldConfig } from "../../../../../hooks";
 
+// Full fields for creating new shop orders
 export const SHOP_ORDER_FORM_FIELDS: FormFieldConfig[] = [
   {
     key: "guest_id",
@@ -51,5 +52,22 @@ export const SHOP_ORDER_FORM_FIELDS: FormFieldConfig[] = [
     type: "textarea" as const,
     required: false,
     placeholder: "Any special instructions for this order",
+  },
+];
+
+// Form fields for editing shop orders (only status can be updated)
+export const SHOP_ORDER_EDIT_FORM_FIELDS: FormFieldConfig[] = [
+  {
+    key: "status",
+    label: "Status",
+    type: "select" as const,
+    required: true,
+    options: [
+      { value: "PENDING", label: "Pending" },
+      { value: "PROCESSING", label: "Processing" },
+      { value: "COMPLETED", label: "Completed" },
+      { value: "DELIVERED", label: "Delivered" },
+      { value: "CANCELLED", label: "Cancelled" },
+    ],
   },
 ];

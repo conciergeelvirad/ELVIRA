@@ -38,7 +38,9 @@ export const useAmenityRequests = (hotelId: string) => {
           *,
           amenities!inner(
             id,
-            name
+            name,
+            image_url,
+            description
           ),
           guests!inner(
             id,
@@ -80,7 +82,9 @@ export const useAmenityRequestById = (requestId: string | undefined) => {
           *,
           amenities!inner(
             id,
-            name
+            name,
+            image_url,
+            description
           ),
           guests!inner(
             id,

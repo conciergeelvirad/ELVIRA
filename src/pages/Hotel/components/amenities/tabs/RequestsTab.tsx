@@ -5,10 +5,8 @@
  * Includes search, filter, view modes, and CRUD operations.
  */
 
-import { Plus } from "lucide-react";
 import {
   SearchAndFilterBar,
-  Button,
   CRUDModalContainer,
   LoadingState,
 } from "../../../../../components/common";
@@ -16,6 +14,7 @@ import {
   AmenityRequestsDataView,
   AmenityRequestDetail,
   AMENITY_REQUEST_FORM_FIELDS,
+  AMENITY_REQUEST_EDIT_FORM_FIELDS,
   enhanceAmenityRequest,
 } from "../index";
 
@@ -64,15 +63,6 @@ export const RequestsTab = ({
         onFilterToggle={() => setFilterValue(filterValue ? "" : "pending")}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        rightActions={
-          <Button
-            variant="dark"
-            leftIcon={Plus}
-            onClick={modalActions.openCreateModal}
-          >
-            ADD REQUEST
-          </Button>
-        }
       />
 
       {isLoading ? (
@@ -102,6 +92,7 @@ export const RequestsTab = ({
         formState={formState}
         formActions={formActions}
         formFields={AMENITY_REQUEST_FORM_FIELDS}
+        editFormFields={AMENITY_REQUEST_EDIT_FORM_FIELDS}
         onCreateSubmit={handleCreateSubmit}
         onEditSubmit={handleEditSubmit}
         onDeleteConfirm={handleDeleteConfirm}

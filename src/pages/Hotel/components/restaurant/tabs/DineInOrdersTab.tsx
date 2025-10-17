@@ -4,13 +4,16 @@
  * Simplified tab component for managing dine-in orders
  */
 
-import { Plus } from "lucide-react";
 import {
-  Button,
   SearchAndFilterBar,
   CRUDModalContainer,
 } from "../../../../../components/common";
-import { DineInOrdersDataView, DINE_IN_ORDER_FORM_FIELDS } from "../index";
+import {
+  DineInOrdersDataView,
+  DINE_IN_ORDER_FORM_FIELDS,
+  DINE_IN_ORDER_EDIT_FORM_FIELDS,
+  DineInOrderDetail,
+} from "../index";
 import type { useDineInOrderCRUD } from "../../../hooks/restaurant/useDineInOrderCRUD";
 import type {
   Restaurant,
@@ -68,15 +71,6 @@ export const DineInOrdersTab = ({
         }
         viewMode={dineInOrderCRUD.searchAndFilter.mode}
         onViewModeChange={dineInOrderCRUD.searchAndFilter.setViewMode}
-        rightActions={
-          <Button
-            variant="dark"
-            leftIcon={Plus}
-            onClick={dineInOrderCRUD.modalActions.openCreateModal}
-          >
-            Add Order
-          </Button>
-        }
       />
       <DineInOrdersDataView
         viewMode={dineInOrderCRUD.searchAndFilter.mode}
@@ -103,10 +97,18 @@ export const DineInOrdersTab = ({
         formState={dineInOrderCRUD.formState}
         formActions={dineInOrderCRUD.formActions}
         formFields={DINE_IN_ORDER_FORM_FIELDS}
+        editFormFields={DINE_IN_ORDER_EDIT_FORM_FIELDS}
         onCreateSubmit={dineInOrderCRUD.handleCreateSubmit}
         onEditSubmit={dineInOrderCRUD.handleEditSubmit}
         onDeleteConfirm={dineInOrderCRUD.handleDeleteConfirm}
         entityName="Dine-In Order"
+        renderDetailContent={(item) => {
+          console.log(
+            "📋 [DineInOrdersTab] renderDetailContent called with item:",
+            item
+          );
+          return <DineInOrderDetail item={item as any} />;
+        }}
       />
     </>
   );

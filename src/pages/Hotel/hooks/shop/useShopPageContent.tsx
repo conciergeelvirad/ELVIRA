@@ -64,7 +64,16 @@ export const useShopPageContent = ({
   );
 
   // Get columns based on current state for orders
-  const orderTableColumns = React.useMemo(() => getShopOrderTableColumns(), []);
+  const orderTableColumns = React.useMemo(
+    () =>
+      getShopOrderTableColumns((order) => {
+        // When status badge is clicked, open edit modal with only status editable
+        const orderData = order;
+        shopOrderCRUD.formActions.setFormData(orderData);
+        shopOrderCRUD.modalActions.openEditModal(orderData);
+      }),
+    [shopOrderCRUD]
+  );
 
   const orderGridColumns = React.useMemo(() => getShopOrderGridColumns(), []);
 

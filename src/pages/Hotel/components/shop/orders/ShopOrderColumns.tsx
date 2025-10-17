@@ -1,7 +1,10 @@
 import { Package } from "lucide-react";
 import { Column, GridColumn } from "../../../../../types/table";
-import { StatusBadge } from "../../../../../components/common";
-import { ShopOrder } from "../../../../../hooks/queries/hotel-management/shop-orders";
+import { StatusBadge, ItemWithImage } from "../../../../../components/common";
+import {
+  ShopOrder,
+  ExtendedShopOrder,
+} from "../../../../../hooks/queries/hotel-management/shop-orders";
 
 type EnhancedShopOrder = ShopOrder & Record<string, unknown>;
 
@@ -28,7 +31,9 @@ const mapOrderStatus = (
   }
 };
 
-export const getTableColumns = (): Column<ShopOrder>[] => {
+export const getTableColumns = (
+  onStatusClick?: (order: ExtendedShopOrder) => void
+): Column<ExtendedShopOrder>[] => {
   return [
     {
       key: "id",
@@ -44,28 +49,68 @@ export const getTableColumns = (): Column<ShopOrder>[] => {
       ),
     },
     {
-      key: "guest_id",
+      key: "shop_order_items",
+      header: "ITEMS",
+      sortable: false,
+      render: (_value, order) => {
+        const items = order.shop_order_items || [];
+        const firstItem = items[0];
+        const product = firstItem?.product;
+        const itemCount = items.length;
+
+        return (
+          <ItemWithImage
+            imageUrl={product?.image_url || ""}
+            title={product?.name || "Order Items"}
+            description={itemCount > 1 ? `+${itemCount - 1} more items` : ""}
+            fallbackIcon={<Package className="w-5 h-5" />}
+          />
+        );
+      },
+    },
+    {
+      key: "guests",
       header: "GUEST",
       sortable: true,
-      render: (value) => (
-        <span className="text-sm text-gray-600">
-          {String(value).slice(0, 8)}...
-        </span>
-      ),
+      render: (_value, order) => {
+        const guest = order.guests as any;
+        const personalData = guest?.guest_personal_data;
+        const fullName = personalData
+          ? `${personalData.first_name} ${personalData.last_name}`
+          : "Unknown Guest";
+        return <span className="text-sm text-gray-900">{fullName}</span>;
+      },
     },
     {
-      key: "total_price",
-      header: "TOTAL",
+      key: "room_number",
+      header: "ROOM",
       sortable: true,
-      render: (value) => (
-        <span className="font-semibold text-green-600">
-          ${typeof value === "number" ? value.toFixed(2) : "0.00"}
-        </span>
+      render: (_value, order) => {
+        const guest = order.guests as any;
+        return (
+          <span className="text-sm text-gray-600">
+            {guest?.room_number || "N/A"}
+          </span>
+        );
+      },
+    },
+    {
+      key: "status",
+      header: "STATUS",
+      sortable: true,
+      render: (value, order) => (
+        <StatusBadge
+          status={mapOrderStatus(String(value))}
+          label={String(value).toUpperCase()}
+          variant="soft"
+          onClick={onStatusClick ? () => onStatusClick(order) : undefined}
+          clickable={!!onStatusClick}
+        />
       ),
     },
     {
-      key: "delivery_date",
-      header: "DELIVERY DATE",
+      key: "created_at",
+      header: "CREATED",
       sortable: true,
       render: (value) => (
         <span className="text-sm text-gray-600">
@@ -77,18 +122,6 @@ export const getTableColumns = (): Column<ShopOrder>[] => {
               })
             : "N/A"}
         </span>
-      ),
-    },
-    {
-      key: "status",
-      header: "STATUS",
-      sortable: true,
-      render: (value) => (
-        <StatusBadge
-          status={mapOrderStatus(String(value))}
-          label={String(value).toUpperCase()}
-          variant="soft"
-        />
       ),
     },
   ];
@@ -103,26 +136,24 @@ export const getGridColumns = (): GridColumn[] => {
       render: (value: string) => `#${value.slice(0, 8)}`,
     },
     {
-      key: "guest_id",
+      key: "items",
+      label: "Items",
+      accessor: "shop_order_items",
+    },
+    {
+      key: "guest",
       label: "Guest",
-      accessor: "guest_id",
+      accessor: "guests",
+    },
+    {
+      key: "room_number",
+      label: "Room",
+      accessor: "guests",
     },
     {
       key: "total_price",
       label: "Total",
       accessor: "total_price",
-      render: (value: number) => `$${value.toFixed(2)}`,
-    },
-    {
-      key: "delivery_date",
-      label: "Delivery Date",
-      accessor: "delivery_date",
-      render: (value: string) =>
-        new Date(value).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        }),
     },
     {
       key: "status",
@@ -136,13 +167,17 @@ export const getGridColumns = (): GridColumn[] => {
         />
       ),
     },
+    {
+      key: "created_at",
+      label: "Created",
+      accessor: "created_at",
+    },
   ];
 };
 
 // Detail fields for the modal
 export const getDetailFields = (order: ShopOrder) => [
   { label: "Order ID", value: `#${order.id.slice(0, 8)}` },
-  { label: "Guest ID", value: order.guest_id },
   { label: "Total Price", value: `$${order.total_price.toFixed(2)}` },
   {
     label: "Delivery Date",

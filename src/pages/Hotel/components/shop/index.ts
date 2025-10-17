@@ -20,7 +20,10 @@ export {
   enhanceShopOrder,
   getDetailFields as getShopOrderDetailFields,
 } from "./orders/ShopOrderColumns";
-export { SHOP_ORDER_FORM_FIELDS } from "./orders/ShopOrderFormFields";
+export {
+  SHOP_ORDER_FORM_FIELDS,
+  SHOP_ORDER_EDIT_FORM_FIELDS,
+} from "./orders/ShopOrderFormFields";
 
 // Tab components
 export { ProductsTab } from "./tabs/ProductsTab";
