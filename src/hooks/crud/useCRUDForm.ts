@@ -3,7 +3,15 @@ import { useState, useCallback } from "react";
 export interface FormFieldConfig {
   key: string;
   label: string;
-  type: "text" | "email" | "tel" | "select" | "textarea" | "number" | "date";
+  type:
+    | "text"
+    | "email"
+    | "tel"
+    | "select"
+    | "textarea"
+    | "number"
+    | "date"
+    | "file";
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
@@ -12,6 +20,14 @@ export interface FormFieldConfig {
   gridColumn?: "full" | "half"; // For layout control
   maxLength?: number; // For input length restriction
   showGenerateButton?: boolean; // For showing generate button (e.g., access code)
+  accept?: string; // For file input accept attribute
+  storageFolder?:
+    | "AMENITIES"
+    | "PRODUCTS"
+    | "MENU_ITEMS"
+    | "HOTEL_GALLERY"
+    | "MESSAGES"
+    | "USERS_AVATAR"; // For file uploads
 }
 
 export interface CRUDFormState {

@@ -42,9 +42,9 @@ export const PRODUCT_FORM_FIELDS: FormFieldConfig[] = [
   },
   {
     key: "image_url",
-    label: "Image URL",
-    type: "text" as const,
+    label: "Product Image",
+    type: "file" as const,
     required: false,
-    placeholder: "https://example.com/image.jpg",
+    storageFolder: "PRODUCTS",
   },
 ];

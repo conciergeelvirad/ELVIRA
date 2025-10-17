@@ -97,7 +97,7 @@ export const AmenitiesTab = ({
               description: amenity.description,
               category: amenity.category,
               price: amenity.price,
-              hotel_recommended: amenity.hotel_recommended,
+              recommended: amenity.recommended,
               is_active: amenity.is_active,
               image_url: amenity.image_url,
             });

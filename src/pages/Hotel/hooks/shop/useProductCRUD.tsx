@@ -52,6 +52,7 @@ export const useProductCRUD = ({
       price: (data.price as number) ?? 0,
       stock_quantity: (data.stock_quantity as number) ?? 0,
       is_available: (data.is_available as boolean) ?? true,
+      image_url: (data.image_url as string) || null,
       hotel_id: getHotelId(),
     }),
     // Transform form data to database update format
@@ -75,6 +76,9 @@ export const useProductCRUD = ({
           }),
           ...(data.recommended !== undefined && {
             recommended: data.recommended as boolean,
+          }),
+          ...(data.image_url !== undefined && {
+            image_url: (data.image_url as string) || null,
           }),
         },
       };

@@ -34,7 +34,7 @@ export const AMENITY_FORM_FIELDS: FormFieldConfig[] = [
     placeholder: "0.00",
   },
   {
-    key: "hotel_recommended",
+    key: "recommended",
     label: "Hotel Recommended",
     type: "select" as const,
     required: false,
@@ -55,9 +55,9 @@ export const AMENITY_FORM_FIELDS: FormFieldConfig[] = [
   },
   {
     key: "image_url",
-    label: "Image URL",
-    type: "text" as const,
+    label: "Amenity Image",
+    type: "file" as const,
     required: false,
-    placeholder: "https://example.com/image.jpg",
+    storageFolder: "AMENITIES",
   },
 ];

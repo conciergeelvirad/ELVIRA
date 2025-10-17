@@ -2,6 +2,7 @@ import React from "react";
 import { Dices } from "lucide-react";
 import { cn, generateAccessCode } from "../../../utils";
 import { FormFieldConfig } from "../../../hooks";
+import { ImageUploadField } from "../form/ImageUploadField";
 
 interface DynamicFormFieldProps {
   field: FormFieldConfig;
@@ -38,6 +39,19 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
 
   const renderField = () => {
     switch (field.type) {
+      case "file":
+        return (
+          <ImageUploadField
+            label=""
+            value={stringValue}
+            onChange={onChange}
+            error={error}
+            disabled={disabled}
+            required={field.required}
+            storageFolder={field.storageFolder || "PRODUCTS"}
+          />
+        );
+
       case "select":
         return (
           <select
@@ -127,12 +141,16 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
 
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700">
-        {field.label}
-        {field.required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+      {/* Only show label if not a file field (file field has its own label) */}
+      {field.type !== "file" && (
+        <label className="block text-sm font-medium text-gray-700">
+          {field.label}
+          {field.required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      )}
       {renderField()}
-      {error && (
+      {/* Error is shown within ImageUploadField for file type */}
+      {error && field.type !== "file" && (
         <p className="text-sm text-red-600" role="alert">
           {error}
         </p>

@@ -26,6 +26,13 @@ interface UseAmenityCRUDProps {
   formFields: FormFieldConfig[];
 }
 
+// Helper to convert string boolean to actual boolean
+const toBoolean = (value: unknown): boolean => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return value === "true";
+  return Boolean(value);
+};
+
 export const useAmenityCRUD = ({
   initialAmenities,
   formFields,
@@ -49,8 +56,9 @@ export const useAmenityCRUD = ({
       description: (data.description as string) || null,
       category: (data.category as string) || "other",
       price: (data.price as number) ?? 0,
-      is_active: (data.is_active as boolean) ?? true,
-      hotel_recommended: (data.hotel_recommended as boolean) ?? false,
+      is_active: toBoolean(data.is_active ?? true),
+      recommended: toBoolean(data.recommended ?? false),
+      image_url: (data.image_url as string) || null,
       hotel_id: getHotelId(),
     }),
     // Transform form data to database update format
@@ -66,13 +74,13 @@ export const useAmenityCRUD = ({
         }),
         ...(data.price !== undefined && { price: data.price as number }),
         ...(data.is_active !== undefined && {
-          is_active: data.is_active as boolean,
+          is_active: toBoolean(data.is_active),
         }),
         ...(data.recommended !== undefined && {
-          recommended: data.recommended as boolean,
+          recommended: toBoolean(data.recommended),
         }),
-        ...(data.hotel_recommended !== undefined && {
-          hotel_recommended: data.hotel_recommended as boolean,
+        ...(data.image_url !== undefined && {
+          image_url: (data.image_url as string) || null,
         }),
       };
       console.log("🔄 transformUpdate AMENITY:", { id, data, updatePayload });

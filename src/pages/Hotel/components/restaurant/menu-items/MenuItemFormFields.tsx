@@ -45,4 +45,11 @@ export const MENU_ITEM_FORM_FIELDS: FormFieldConfig[] = [
       { value: "false", label: "Unavailable" },
     ],
   },
+  {
+    key: "image_url",
+    label: "Menu Item Image",
+    type: "file" as const,
+    required: false,
+    storageFolder: "MENU_ITEMS",
+  },
 ];
