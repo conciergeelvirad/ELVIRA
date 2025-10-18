@@ -11,7 +11,9 @@ interface SearchAndFilterBarProps {
   // Filter functionality
   filterActive?: boolean;
   onFilterToggle?: () => void;
+  onFilterClick?: () => void; // For advanced filter modal
   filterLabel?: string;
+  filterBadgeCount?: number; // For showing active filter count
 
   // View mode toggle
   viewMode?: "grid" | "list";
@@ -32,7 +34,9 @@ export const SearchAndFilterBar = ({
   searchPlaceholder = "Search...",
   filterActive = false,
   onFilterToggle,
+  onFilterClick,
   filterLabel = "Filter",
+  filterBadgeCount,
   viewMode = "list",
   onViewModeChange,
   showViewToggle = true,
@@ -40,6 +44,9 @@ export const SearchAndFilterBar = ({
   rightActions,
   className,
 }: SearchAndFilterBarProps) => {
+  // Use onFilterClick if provided, otherwise fallback to onFilterToggle
+  const handleFilterClick = onFilterClick || onFilterToggle;
+
   return (
     <ActionBar className={className}>
       <ActionBarSection align="left">
@@ -49,11 +56,12 @@ export const SearchAndFilterBar = ({
           onSearchChange={onSearchChange}
           className="w-96"
         />
-        {onFilterToggle && (
+        {handleFilterClick && (
           <FilterButton
             active={filterActive}
-            onClick={onFilterToggle}
+            onClick={handleFilterClick}
             title={filterLabel}
+            badgeCount={filterBadgeCount}
           />
         )}
         {leftActions}

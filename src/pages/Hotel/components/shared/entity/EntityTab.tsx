@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Plus } from "lucide-react";
 import {
   SearchAndFilterBar,
@@ -6,6 +6,10 @@ import {
   CRUDModalContainer,
   LoadingState,
 } from "../../../../../components/common";
+import {
+  FilterModal,
+  type FilterOptions,
+} from "../../../../Guests/components/common/FilterModal";
 import { EntityDataView } from "./EntityDataView";
 import type { FormFieldConfig } from "../../../../../hooks";
 
@@ -39,6 +43,20 @@ interface EntityTabProps<T> {
   // Optional
   currency?: string;
   showAddButton?: boolean;
+
+  // Custom filter panel (replaces FilterModal)
+  // Pass a function that accepts isOpen and onToggle
+  filterPanel?: (isOpen: boolean, onToggle: () => void) => React.ReactNode;
+
+  // Filter configuration (optional - deprecated, use filterPanel instead)
+  enableAdvancedFilters?: boolean;
+  filterCategories?: string[];
+  filterMaxPrice?: number;
+  filterServiceTypes?: string[];
+  getItemCategory?: (item: T) => string;
+  getItemPrice?: (item: T) => number;
+  getItemRecommended?: (item: T) => boolean;
+  getItemServiceTypes?: (item: T) => string[];
 }
 
 /**
@@ -85,6 +103,15 @@ export const EntityTab = <T extends Record<string, unknown>>({
   editFormFields,
   currency,
   showAddButton = true,
+  filterPanel,
+  enableAdvancedFilters = false,
+  filterCategories = [],
+  filterMaxPrice = 1000,
+  filterServiceTypes = [],
+  getItemCategory,
+  getItemPrice,
+  getItemRecommended,
+  getItemServiceTypes,
 }: EntityTabProps<T>) => {
   const {
     searchAndFilter,
@@ -107,6 +134,92 @@ export const EntityTab = <T extends Record<string, unknown>>({
     filteredData,
   } = searchAndFilter;
 
+  // Advanced filter state
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterOptions>({
+    selectedCategories: [],
+    priceRange: { min: 0, max: filterMaxPrice },
+    showOnlyRecommended: false,
+    selectedServiceTypes: [],
+  });
+
+  // Apply advanced filters to data
+  const finalFilteredData = useMemo(() => {
+    if (!enableAdvancedFilters) return filteredData;
+
+    let result = [...filteredData];
+
+    // Filter by categories
+    if (advancedFilters.selectedCategories.length > 0 && getItemCategory) {
+      result = result.filter((item) =>
+        advancedFilters.selectedCategories.includes(getItemCategory(item))
+      );
+    }
+
+    // Filter by price range
+    if (getItemPrice) {
+      result = result.filter((item) => {
+        const price = getItemPrice(item);
+        return (
+          price >= advancedFilters.priceRange.min &&
+          price <= advancedFilters.priceRange.max
+        );
+      });
+    }
+
+    // Filter by recommended
+    if (advancedFilters.showOnlyRecommended && getItemRecommended) {
+      result = result.filter((item) => getItemRecommended(item));
+    }
+
+    // Filter by service types (for menu items)
+    if (
+      advancedFilters.selectedServiceTypes &&
+      advancedFilters.selectedServiceTypes.length > 0 &&
+      getItemServiceTypes
+    ) {
+      result = result.filter((item) => {
+        const itemServiceTypes = getItemServiceTypes(item);
+        return advancedFilters.selectedServiceTypes!.some((type) =>
+          itemServiceTypes.includes(type)
+        );
+      });
+    }
+
+    return result;
+  }, [
+    enableAdvancedFilters,
+    filteredData,
+    advancedFilters,
+    getItemCategory,
+    getItemPrice,
+    getItemRecommended,
+    getItemServiceTypes,
+  ]);
+
+  // Handle filter apply
+  const handleApplyFilters = useCallback((filters: FilterOptions) => {
+    setAdvancedFilters(filters);
+  }, []);
+
+  // Count active filters
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (advancedFilters.selectedCategories.length > 0) count++;
+    if (
+      advancedFilters.priceRange.min > 0 ||
+      advancedFilters.priceRange.max < filterMaxPrice
+    )
+      count++;
+    if (advancedFilters.showOnlyRecommended) count++;
+    if (
+      advancedFilters.selectedServiceTypes &&
+      advancedFilters.selectedServiceTypes.length > 0
+    )
+      count++;
+    return count;
+  }, [advancedFilters, filterMaxPrice]);
+
   if (isLoading) {
     return <LoadingState message={`Loading ${entityName.toLowerCase()}...`} />;
   }
@@ -121,6 +234,13 @@ export const EntityTab = <T extends Record<string, unknown>>({
         onFilterToggle={() => setFilterValue(filterValue ? "" : "active")}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        // Show filter button if custom filter panel or advanced filters enabled
+        onFilterClick={
+          filterPanel || enableAdvancedFilters
+            ? () => setIsFilterModalOpen(true)
+            : undefined
+        }
+        filterBadgeCount={enableAdvancedFilters ? activeFilterCount : undefined}
         rightActions={
           showAddButton && (
             <Button
@@ -134,9 +254,15 @@ export const EntityTab = <T extends Record<string, unknown>>({
         }
       />
 
+      {/* Custom Filter Panel (if provided) */}
+      {filterPanel &&
+        filterPanel(isFilterModalOpen, () =>
+          setIsFilterModalOpen(!isFilterModalOpen)
+        )}
+
       <EntityDataView<T>
         viewMode={viewMode}
-        filteredData={filteredData}
+        filteredData={finalFilteredData}
         handleRowClick={modalActions.openDetailModal}
         tableColumns={tableColumns}
         gridColumns={gridColumns}
@@ -160,6 +286,21 @@ export const EntityTab = <T extends Record<string, unknown>>({
         entityName={entityName}
         renderDetailContent={renderDetailContent}
       />
+
+      {/* Advanced Filter Modal */}
+      {enableAdvancedFilters && (
+        <FilterModal
+          isOpen={isFilterModalOpen}
+          onClose={() => setIsFilterModalOpen(false)}
+          onApply={handleApplyFilters}
+          categories={filterCategories}
+          maxPrice={filterMaxPrice}
+          currentFilters={advancedFilters}
+          serviceTypes={
+            filterServiceTypes.length > 0 ? filterServiceTypes : undefined
+          }
+        />
+      )}
     </div>
   );
 };

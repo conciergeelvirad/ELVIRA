@@ -28,23 +28,26 @@ export const RestaurantsTab: React.FC<RestaurantsTabProps> = ({
   gridColumns,
 }) => {
   return (
-    <EntityTab<Restaurant>
-      isLoading={isLoading}
-      crud={crud}
-      tableColumns={tableColumns}
-      gridColumns={gridColumns}
-      entityName={restaurantEntityConfig.entityName}
-      searchPlaceholder={restaurantEntityConfig.searchPlaceholder}
-      addButtonLabel={restaurantEntityConfig.addButtonLabel}
-      emptyMessage={restaurantEntityConfig.emptyMessage}
-      renderCard={(restaurant, onClick) =>
-        restaurantEntityConfig.renderCard(restaurant, onClick, {
-          onEdit: () => crud.modalActions.openEditModal(restaurant),
-          onDelete: () => crud.modalActions.openDeleteModal(restaurant),
-        })
-      }
-      renderDetailContent={restaurantEntityConfig.renderDetail}
-      formFields={restaurantEntityConfig.formFields}
-    />
+    <>
+      {/* Entity Tab */}
+      <EntityTab<Restaurant>
+        isLoading={isLoading}
+        crud={crud}
+        tableColumns={tableColumns}
+        gridColumns={gridColumns}
+        entityName={restaurantEntityConfig.entityName}
+        searchPlaceholder={restaurantEntityConfig.searchPlaceholder}
+        addButtonLabel={restaurantEntityConfig.addButtonLabel}
+        emptyMessage={restaurantEntityConfig.emptyMessage}
+        renderCard={(restaurant, onClick) =>
+          restaurantEntityConfig.renderCard(restaurant, onClick, {
+            onEdit: () => crud.modalActions.openEditModal(restaurant),
+            onDelete: () => crud.modalActions.openDeleteModal(restaurant),
+          })
+        }
+        renderDetailContent={restaurantEntityConfig.renderDetail}
+        formFields={restaurantEntityConfig.formFields}
+      />
+    </>
   );
 };
