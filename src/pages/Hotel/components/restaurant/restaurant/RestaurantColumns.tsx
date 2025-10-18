@@ -35,11 +35,6 @@ export const getRestaurantTableColumns = ({
     accessor: (restaurant) => restaurant.description || "N/A",
   },
   {
-    key: "created_at",
-    header: "Contact",
-    accessor: () => "N/A",
-  },
-  {
     key: "is_active",
     header: "Status",
     accessor: (restaurant) => (

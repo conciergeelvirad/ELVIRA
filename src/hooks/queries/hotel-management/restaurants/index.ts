@@ -103,4 +103,6 @@ export {
   useCreateMenuItem,
   useUpdateMenuItem,
   useDeleteMenuItem,
+  useUpdateDineInOrder,
+  useDeleteDineInOrder,
 } from "./useRestaurantQueries";

@@ -49,8 +49,9 @@ export const AmenitiesPage = () => {
     () => ({
       initialRequests: amenityRequests,
       formFields: AMENITY_REQUEST_FORM_FIELDS,
+      hotelId: hotelId || "",
     }),
-    [amenityRequests]
+    [amenityRequests, hotelId]
   );
 
   const amenityCRUD = useAmenityCRUD(amenityCrudConfig);

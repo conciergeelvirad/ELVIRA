@@ -107,13 +107,35 @@ export const CRUDModalContainer = <T,>({
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formActions.validateForm()) {
+    console.log("🔵 CRUDModalContainer.handleEditSubmit called");
+
+    // For edit forms, we only validate the fields that are actually in editFormFields
+    // This prevents validation errors for hidden required fields
+    const fieldsToValidate = editFormFields || formFields;
+    let isValid = true;
+
+    // Simple validation: check if required fields in edit form have values
+    fieldsToValidate.forEach((field) => {
+      if (field.required) {
+        const value = formState.formData[field.key];
+        if (!value || (typeof value === "string" && value.trim() === "")) {
+          formActions.setError(field.key, `${field.label} is required`);
+          isValid = false;
+        }
+      }
+    });
+
+    console.log("🔵 Form validation result:", isValid);
+    if (isValid) {
       formActions.setSubmitting(true);
       try {
+        console.log("🔵 Calling onEditSubmit from props");
         await onEditSubmit();
+        console.log("🔵 onEditSubmit completed successfully");
         modalActions.closeAllModals();
         formActions.resetForm();
-      } catch {
+      } catch (error) {
+        console.error("❌ Edit submit error:", error);
         formActions.setError(
           "general",
           `Failed to update ${entityName.toLowerCase()}`
@@ -121,6 +143,8 @@ export const CRUDModalContainer = <T,>({
       } finally {
         formActions.setSubmitting(false);
       }
+    } else {
+      console.log("❌ Form validation failed - errors set");
     }
   };
 

@@ -1,6 +1,10 @@
 import { useCRUD } from "../../../../hooks";
 import { FormFieldConfig } from "../../../../hooks";
 import type { AmenityRequest } from "../../../../hooks/queries/hotel-management/amenity-requests";
+import {
+  useUpdateAmenityRequest,
+  useDeleteAmenityRequest,
+} from "../../../../hooks/queries/hotel-management/amenity-requests";
 
 // Define enhanced type for AmenityRequest
 export type EnhancedAmenityRequest = AmenityRequest & {
@@ -16,14 +20,20 @@ type AmenityRequestForCRUD = AmenityRequest & Record<string, unknown>;
 interface UseAmenityRequestCRUDProps {
   initialRequests: AmenityRequest[];
   formFields: FormFieldConfig[];
+  hotelId: string;
 }
 
 export const useAmenityRequestCRUD = ({
   initialRequests,
   formFields,
+  hotelId,
 }: UseAmenityRequestCRUDProps) => {
   // Cast initialRequests to satisfy the CRUDEntity constraint
   const initialDataForCRUD = initialRequests as AmenityRequestForCRUD[];
+
+  // Get mutation hooks for database operations
+  const updateMutation = useUpdateAmenityRequest();
+  const deleteMutation = useDeleteAmenityRequest();
 
   // Use the generic CRUD hook with our AmenityRequest type
   const crud = useCRUD<AmenityRequestForCRUD>({
@@ -31,6 +41,28 @@ export const useAmenityRequestCRUD = ({
     formFields,
     searchFields: ["status", "special_instructions"],
     defaultViewMode: "list",
+    // Connect database mutations
+    customOperations: {
+      update: async (id, data) => {
+        console.log("🔄 useAmenityRequestCRUD - Calling update mutation:", {
+          id,
+          data,
+          hotelId,
+        });
+        await updateMutation.mutateAsync({
+          id: id as string,
+          updates: data,
+          hotelId,
+        });
+        console.log("✅ useAmenityRequestCRUD - Update mutation completed");
+      },
+      delete: async (id) => {
+        await deleteMutation.mutateAsync({
+          id: id as string,
+          hotelId,
+        });
+      },
+    },
     // Customize how new entities are created
     formatNewEntity: (formData) => ({
       ...formData,

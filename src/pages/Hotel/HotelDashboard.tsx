@@ -17,6 +17,7 @@ import { HotelRestaurantPage } from "./HotelRestaurantPage";
 import { HotelShopPage } from "./HotelShopPage";
 import { SettingsPage } from "./SettingsPage";
 import { AISupportPage } from "./AISupportPage";
+import { OverviewPage } from "./OverviewPage";
 
 export const HotelDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -47,14 +48,7 @@ export const HotelDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case "overview":
-        return (
-          <PageContainer>
-            <PageHeader title="Hotel Overview" />
-            <p className="text-gray-600 mt-4">
-              Hotel operations dashboard overview
-            </p>
-          </PageContainer>
-        );
+        return <OverviewPage />;
       case "hotel-staff":
         return <HotelStaffPage />;
       case "chat-management":

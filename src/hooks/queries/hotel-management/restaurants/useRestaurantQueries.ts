@@ -348,3 +348,108 @@ export const useDeleteMenuItem = () => {
     },
   });
 };
+
+// ============================================================================
+// Dine-In Order Mutation Hooks
+// ============================================================================
+
+/**
+ * Updates an existing dine-in order
+ *
+ * @returns Mutation result for updating dine-in order
+ */
+export const useUpdateDineInOrder = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+      hotelId,
+    }: {
+      id: string;
+      updates: Record<string, unknown>;
+      hotelId: string;
+    }) => {
+      console.log("🔄 UPDATE DINE-IN ORDER - Raw updates:", updates);
+
+      // Hotel staff should only update status, not guest order details
+      // Filter out all fields except status
+      const {
+        created_at,
+        guest_id,
+        hotel_id,
+        restaurant_id,
+        guest_name,
+        room_number,
+        special_requests,
+        ...safeUpdates
+      } = updates;
+
+      const finalUpdates = {
+        status: safeUpdates.status,
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log("🔄 UPDATE DINE-IN ORDER - Filtered updates:", finalUpdates);
+
+      const { data, error } = await supabase
+        .from("dine_in_orders")
+        .update(finalUpdates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("❌ UPDATE DINE-IN ORDER ERROR:", error);
+        throw error;
+      }
+      console.log("✅ UPDATE DINE-IN ORDER SUCCESS:", data);
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      console.log("🔄 INVALIDATING QUERIES after dine-in order update");
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.dineInOrdersList(variables.hotelId),
+      });
+    },
+  });
+};
+
+/**
+ * Deletes a dine-in order
+ *
+ * @returns Mutation result for deleting dine-in order
+ */
+export const useDeleteDineInOrder = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      hotelId,
+    }: {
+      id: string;
+      hotelId: string;
+    }): Promise<string> => {
+      console.log("🔄 DELETE DINE-IN ORDER MUTATION:", id);
+      const { error } = await supabase
+        .from("dine_in_orders")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("❌ DELETE DINE-IN ORDER ERROR:", error);
+        throw error;
+      }
+      console.log("✅ DELETE DINE-IN ORDER SUCCESS:", id);
+      return id;
+    },
+    onSuccess: (_data, variables) => {
+      console.log("🔄 INVALIDATING QUERIES after dine-in order deletion");
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.dineInOrdersList(variables.hotelId),
+      });
+    },
+  });
+};

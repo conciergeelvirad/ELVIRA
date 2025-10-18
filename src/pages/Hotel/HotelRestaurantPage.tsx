@@ -37,6 +37,7 @@ export const HotelRestaurantPage = () => {
   const dineInOrderCRUD = useDineInOrderCRUD({
     initialOrders: dineInOrders,
     formFields: DINE_IN_ORDER_FORM_FIELDS,
+    hotelId: hotelId || "",
   });
 
   // Call hooks before any conditional returns

@@ -153,14 +153,42 @@ export const useUpdateAmenityRequest = () => {
       updates,
       hotelId,
     }: AmenityRequestUpdateData): Promise<AmenityRequest> => {
+      console.log("🔄 UPDATE AMENITY REQUEST - Raw updates:", updates);
+
+      // Hotel staff should only update status, not guest request details
+      // Filter out all fields except status
+      const {
+        created_at,
+        guest_id,
+        hotel_id,
+        amenity_id,
+        request_date,
+        special_instructions,
+        ...safeUpdates
+      } = updates as any;
+
+      const finalUpdates = {
+        status: safeUpdates.status,
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log(
+        "🔄 UPDATE AMENITY REQUEST - Filtered updates:",
+        finalUpdates
+      );
+
       const { data, error } = await supabase
         .from("amenity_requests")
-        .update(updates)
+        .update(finalUpdates)
         .eq("id", id)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ UPDATE AMENITY REQUEST ERROR:", error);
+        throw error;
+      }
+      console.log("✅ UPDATE AMENITY REQUEST SUCCESS:", data);
       return data;
     },
     onSuccess: (data, variables) => {

@@ -50,6 +50,24 @@ export const dineInOrderTableColumns: Column<DineInOrderWithDetails>[] = [
     },
   },
   {
+    key: "order_type",
+    header: "TYPE",
+    sortable: true,
+    accessor: (order: DineInOrderWithDetails) => {
+      const orderType = (order as any).order_type || "dine-in";
+      const typeDisplay = orderType
+        .split("-")
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
+      return (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {typeDisplay}
+        </span>
+      );
+    },
+  },
+  {
     key: "items",
     header: "ITEMS",
     sortable: false,
@@ -206,19 +224,26 @@ export const dineInOrderDetailFields = [
 // Detail fields for the modal - only showing relevant information
 export const getDetailFields = (order: DineInOrder) => {
   console.log("🔍 [getDetailFields] Called with order:", order);
-  console.log("🔍 [getDetailFields] Order service_type:", order.service_type);
-  console.log(
-    "🔍 [getDetailFields] Order total_price:",
-    (order as any).total_price
-  );
 
-  const isRoomService = order.service_type === "room_service";
+  // Determine order type (room_service vs restaurant/dine-in)
+  const orderType = (order as any).order_type || "dine-in";
+  const isRoomService =
+    orderType === "room_service" || orderType === "room-service";
+
+  console.log("🔍 [getDetailFields] Order type:", orderType);
   console.log("🔍 [getDetailFields] Is room service:", isRoomService);
 
   const fields = [
     {
       label: "Order ID",
       value: `#${order.id.slice(0, 8)}`,
+    },
+    {
+      label: "Order Type",
+      value: orderType
+        .split("-")
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "),
     },
     {
       label: "Total Price",
@@ -230,8 +255,9 @@ export const getDetailFields = (order: DineInOrder) => {
 
   console.log("🔍 [getDetailFields] Initial fields:", fields);
 
-  // Add date/time based on order type
+  // Add fields based on order type
   if (isRoomService) {
+    // Room Service fields: delivery_date, delivery_time
     fields.push(
       {
         label: "Delivery Date",
@@ -249,32 +275,57 @@ export const getDetailFields = (order: DineInOrder) => {
       }
     );
   } else {
+    // Restaurant/Dine-in fields: restaurant_name, reservation_date, reservation_time, number_of_guests, table_preferences
+    // Add restaurant name if available
+    const restaurantName =
+      (order as any).restaurant?.name || (order as any).restaurant_name;
+    if (restaurantName) {
+      fields.push({
+        label: "Restaurant",
+        value: restaurantName,
+      });
+    }
+
     fields.push(
       {
         label: "Reservation Date",
-        value: order.reservation_date
-          ? new Date(order.reservation_date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
+        value: (order as any).reservation_date
+          ? new Date((order as any).reservation_date).toLocaleDateString(
+              "en-US",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            )
           : "N/A",
       },
       {
         label: "Reservation Time",
-        value: order.reservation_time || "Not specified",
+        value: (order as any).reservation_time || "Not specified",
+      },
+      {
+        label: "Number of Guests",
+        value: (order as any).number_of_guests?.toString() || "Not specified",
+      },
+      {
+        label: "Table Preferences",
+        value: (order as any).table_preferences || "None",
       }
     );
   }
 
+  // Special Instructions - shown for BOTH order types
+  fields.push({
+    label: "Special Instructions",
+    value: (order as any).special_instructions || "None",
+  });
+
+  // Common fields shown for both types
   fields.push(
     {
       label: "Status",
       value: order.status.toUpperCase(),
-    },
-    {
-      label: "Special Instructions",
-      value: order.special_instructions || "None",
     },
     {
       label: "Created",
@@ -668,7 +719,9 @@ export const DINE_IN_ORDER_FORM_FIELDS: FormFieldConfig[] = [
     required: true,
     options: [
       { value: "pending", label: "Pending" },
-      { value: "in_progress", label: "In Progress" },
+      { value: "confirmed", label: "Confirmed" },
+      { value: "preparing", label: "Preparing" },
+      { value: "ready", label: "Ready" },
       { value: "completed", label: "Completed" },
       { value: "cancelled", label: "Cancelled" },
     ],
@@ -684,7 +737,9 @@ export const DINE_IN_ORDER_EDIT_FORM_FIELDS: FormFieldConfig[] = [
     required: true,
     options: [
       { value: "pending", label: "Pending" },
-      { value: "in_progress", label: "In Progress" },
+      { value: "confirmed", label: "Confirmed" },
+      { value: "preparing", label: "Preparing" },
+      { value: "ready", label: "Ready" },
       { value: "completed", label: "Completed" },
       { value: "cancelled", label: "Cancelled" },
     ],

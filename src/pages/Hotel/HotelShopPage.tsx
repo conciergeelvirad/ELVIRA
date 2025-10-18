@@ -47,8 +47,9 @@ export const HotelShopPage = () => {
     () => ({
       initialOrders: shopOrders,
       formFields: SHOP_ORDER_FORM_FIELDS,
+      hotelId: hotelId || "",
     }),
-    [shopOrders]
+    [shopOrders, hotelId]
   );
 
   const productCRUD = useProductCRUD(productCrudConfig);

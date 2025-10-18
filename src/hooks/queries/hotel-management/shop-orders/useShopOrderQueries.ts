@@ -182,14 +182,44 @@ export const useUpdateShopOrder = () => {
       updates,
       hotelId,
     }: ShopOrderUpdateData): Promise<ShopOrder> => {
+      console.log("🔄 UPDATE SHOP ORDER - Raw updates:", updates);
+
+      // Filter out fields that shouldn't be updated by hotel staff
+      // - created_at: timestamp that shouldn't change
+      // - delivery_date & delivery_time: set by guest, not hotel
+      // - guest_id, hotel_id: relationships that shouldn't change
+      const {
+        delivery_date,
+        delivery_time,
+        created_at,
+        guest_id,
+        hotel_id,
+        total_price,
+        special_instructions,
+        room_number,
+        ...safeUpdates
+      } = updates as any;
+
+      // Only include status and updated_at for hotel staff updates
+      const finalUpdates: any = {
+        status: safeUpdates.status,
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log("🔄 UPDATE SHOP ORDER - Filtered updates:", finalUpdates);
+
       const { data, error } = await supabase
         .from("shop_orders")
-        .update(updates)
+        .update(finalUpdates)
         .eq("id", id)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ UPDATE SHOP ORDER ERROR:", error);
+        throw error;
+      }
+      console.log("✅ UPDATE SHOP ORDER SUCCESS:", data);
       return data;
     },
     onSuccess: (data, variables) => {
