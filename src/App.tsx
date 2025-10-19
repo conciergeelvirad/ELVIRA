@@ -3,7 +3,7 @@ import { HotelDashboard } from "./pages/Hotel/HotelDashboard";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { queryClient } from "./lib/queryClient";
-import { LoginPage, GuestLoginPage } from "./pages/auth";
+import { LoginPage, GuestLoginPage, ResetPasswordPage } from "./pages/auth";
 import { GuestDashboard } from "./pages/Guests";
 import { useAuth } from "./hooks/auth/useAuth";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -19,6 +19,7 @@ function AppContent() {
         <Route path="/guest" element={<GuestLoginPage />} />
         <Route path="/guest/dashboard" element={<GuestDashboard />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
