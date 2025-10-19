@@ -59,14 +59,14 @@ const statusConfig = {
     soft: "bg-red-100 text-red-800 border-red-200",
   },
   medium: {
-    filled: "bg-orange-600 text-white",
-    outlined: "border-orange-600 text-orange-600 bg-transparent",
-    soft: "bg-orange-100 text-orange-800 border-orange-200",
+    filled: "bg-yellow-600 text-white",
+    outlined: "border-yellow-600 text-yellow-600 bg-transparent",
+    soft: "bg-yellow-100 text-yellow-800 border-yellow-200",
   },
   low: {
-    filled: "bg-green-600 text-white",
-    outlined: "border-green-600 text-green-600 bg-transparent",
-    soft: "bg-green-100 text-green-800 border-green-200",
+    filled: "bg-blue-600 text-white",
+    outlined: "border-blue-600 text-blue-600 bg-transparent",
+    soft: "bg-blue-100 text-blue-800 border-blue-200",
   },
   success: {
     filled: "bg-emerald-600 text-white",
